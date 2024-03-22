@@ -3,6 +3,7 @@ import { Buffer } from 'node:buffer'
 import type { ReadableStreamDefaultReader } from 'node:stream/web'
 import type { Env, Hono, Schema } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
+import { mergePath } from 'hono/utils/url'
 
 import type {
   ALBRequestContext,
@@ -142,7 +143,8 @@ export function streamHandle<
   return awslambda.streamifyResponse(
     async (event: LambdaEvent, responseStream: NodeJS.WritableStream, context: LambdaContext) => {
       try {
-        const req = createRequest(event)
+        // @ts-expect-error _basePath is private
+        const req = createRequest(event, app._basePath)
 
         const res = await app.fetch(req, {
           event,
@@ -181,7 +183,8 @@ export function handle<E extends Env = Env, S extends Schema = {}, BasePath exte
     event: LambdaEvent,
     lambdaContext?: LambdaContext,
   ): Promise<APIGatewayProxyResult> => {
-    const req = createRequest(event)
+    // @ts-expect-error _basePath is private
+    const req = createRequest(event, app._basePath)
 
     const res = await app.fetch(req, {
       event,
@@ -218,14 +221,18 @@ async function createResult(event: LambdaEvent, res: Response): Promise<APIGatew
   return result
 }
 
-function createRequest(event: LambdaEvent) {
+/**
+ * @param basePath Needed to hack basePath support for trigger events.
+ */
+function createRequest(event: LambdaEvent, basePath: string) {
   if (isTriggerEvent(event)) {
     const requestInit: RequestInit = {
       method: 'TRIGGER',
     }
 
-    // adding '/' before eventSource because hono enforce prefix all paths starting with a '/', ref: https://github.com/honojs/hono/blob/main/src/utils/url.ts#L91
-    return new Request(`http://localhost/${getEventSource(event)}`, requestInit)
+    const path = mergePath(basePath!, getEventSource(event))
+
+    return new Request(`http://localhost${path}`, requestInit)
   }
   else {
     const queryString = extractQueryString(event)
