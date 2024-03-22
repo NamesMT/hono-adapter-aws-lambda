@@ -1,7 +1,8 @@
-import { isContentTypeBinary, isContentEncodingBinary } from './handler'
+import { describe, expect, it } from 'vitest'
+import { isContentEncodingBinary, isContentTypeBinary } from './handler'
 
 describe('isContentTypeBinary', () => {
-  it('Should determine whether it is binary', () => {
+  it('should determine whether it is binary', () => {
     expect(isContentTypeBinary('image/png')).toBe(true)
     expect(isContentTypeBinary('font/woff2')).toBe(true)
     expect(isContentTypeBinary('image/svg+xml')).toBe(false)
@@ -17,7 +18,7 @@ describe('isContentTypeBinary', () => {
 })
 
 describe('isContentEncodingBinary', () => {
-  it('Should determine whether it is compressed', () => {
+  it('should determine whether it is compressed', () => {
     expect(isContentEncodingBinary('gzip')).toBe(true)
     expect(isContentEncodingBinary('compress')).toBe(true)
     expect(isContentEncodingBinary('deflate')).toBe(true)
