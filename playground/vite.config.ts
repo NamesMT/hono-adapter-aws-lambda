@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import Inspect from 'vite-plugin-inspect'
-import * as rootPackage from 'hono-adapter-aws-lambda'
+import * as rootPackage from '@namesmt/hono-adapter-aws-lambda'
 
 // eslint-disable-next-line no-console
 console.log({ rootPackage: JSON.stringify(rootPackage) })

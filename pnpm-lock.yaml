@@ -60,7 +60,7 @@ importers:
 
   playground:
     devDependencies:
-      hono-adapter-aws-lambda:
+      '@namesmt/hono-adapter-aws-lambda':
         specifier: workspace:^
         version: link:..
       nodemon:

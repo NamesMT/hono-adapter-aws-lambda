@@ -1,4 +1,4 @@
-# hono-adapter-aws-lambda [![NPM version](https://img.shields.io/npm/v/hono-adapter-aws-lambda?color=a1b858&label=)](https://www.npmjs.com/package/hono-adapter-aws-lambda)
+# hono-adapter-aws-lambda [![NPM version](https://img.shields.io/npm/v/@namesmt/hono-adapter-aws-lambda?color=a1b858&label=)](https://www.npmjs.com/package/@namesmt/hono-adapter-aws-lambda)
 
 **hono-adapter-aws-lambda** is a fork of [hono](https://hono.dev/)'s `aws-lambda` adapter, experimenting and adding some extra features
 
@@ -10,19 +10,19 @@
 ### Install package:
 ```sh
 # npm
-npm install hono-adapter-aws-lambda
+npm install @namesmt/hono-adapter-aws-lambda
 
 # yarn
-yarn add hono-adapter-aws-lambda
+yarn add @namesmt/hono-adapter-aws-lambda
 
 # pnpm (recommended)
-pnpm install hono-adapter-aws-lambda
+pnpm install @namesmt/hono-adapter-aws-lambda
 ```
 
 ### Import:
 ```ts
 // ESM
-import { handle, streamHandle } from 'hono-adapter-aws-lambda'
+import { handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
 ```
 
 ## License
