@@ -3,7 +3,8 @@
 **hono-adapter-aws-lambda** is a fork of [hono](https://hono.dev/)'s `aws-lambda` adapter, experimenting and adding some extra features
 
 ## Features & Roadmap
-- [ ] add router support for `eventSource`
+- [x] add router support for trigger events.
+  - > Support is added but `route()` group doesn't work yet [#1](https://github.com/NamesMT/hono-adapter-aws-lambda/issues/1)
   - I.e, support for S3, SQS, etc. triggers, which would also support a simpler cross-function call interface.
 
 ## Usage
