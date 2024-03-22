@@ -24,7 +24,7 @@ export interface APIGatewayProxyEventV2 {
   cookies?: string[]
   rawPath: string
   rawQueryString: string
-  body: string | null
+  body?: string | null
   isBase64Encoded: boolean
   requestContext: ApiGatewayRequestContextV2
   queryStringParameters?: {
