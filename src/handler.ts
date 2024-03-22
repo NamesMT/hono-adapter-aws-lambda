@@ -14,7 +14,8 @@ import type { LambdaContext } from './types'
 // @ts-expect-error CryptoKey missing
 globalThis.crypto ??= crypto
 
-export type LambdaEvent = APIGatewayProxyEvent | APIGatewayProxyEventV2 | ALBProxyEvent
+export type LambdaEvent = APIGatewayProxyEvent | APIGatewayProxyEventV2 | ALBProxyEvent | LambdaTriggerEvent
+export type LambdaRequestEvent = APIGatewayProxyEvent | APIGatewayProxyEventV2 | ALBProxyEvent
 
 // When calling HTTP API or Lambda directly through function urls
 export interface APIGatewayProxyEventV2 {
@@ -68,6 +69,48 @@ export interface ALBProxyEvent {
   isBase64Encoded: boolean
   queryStringParameters?: Record<string, string | undefined>
   requestContext: ALBRequestContext
+}
+
+// When calling Lambda through triggers, i.e: S3, SES, SQS.
+// Ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-services.html
+export type LambdaTriggerEvent = CommonRecordsTriggerEvent | eventSourceTriggerEvent | sourceTriggerEvent
+
+/**
+ * "Records.eventSource", A commonly-seen common trigger event schema, which is nested under Records
+ * 
+ * Used by S3, SES, SQS, DynamoDB
+ */
+export interface CommonRecordsTriggerEvent {
+  Records: Array<{
+    eventSource: string
+    eventSourceARN?: string
+    eventVersion?: string
+    eventTime?: string
+    eventName?: string
+    awsRegion?: string
+    [key: string]: any
+  }>
+}
+
+/**
+ * "eventSource" trigger event schema
+ * 
+ * Used by DocumentDB, Kafka, MQ
+ */
+export interface eventSourceTriggerEvent {
+  eventSource: string
+  eventSourceARN?: string
+  [key: string]: any
+}
+
+/**
+ * "source" trigger event schema
+ * 
+ * Used by EC2, EventBridge
+ */
+export interface sourceTriggerEvent {
+  source: string
+  [key: string]: any
 }
 
 export interface APIGatewayProxyResult {
@@ -176,35 +219,45 @@ async function createResult(event: LambdaEvent, res: Response): Promise<APIGatew
 }
 
 function createRequest(event: LambdaEvent) {
-  const queryString = extractQueryString(event)
-  const domainName
-    = event.requestContext && 'domainName' in event.requestContext
-      ? event.requestContext.domainName
-      : event.headers.host
-  const path = isProxyEventV2(event) ? event.rawPath : event.path
-  const urlPath = `https://${domainName}${path}`
-  const url = queryString ? `${urlPath}?${queryString}` : urlPath
+  if (isTriggerEvent(event)) {
+    const requestInit: RequestInit = {
+      method: 'TRIGGER',
+    }
 
-  const headers = new Headers()
-  getCookies(event, headers)
-  for (const [k, v] of Object.entries(event.headers)) {
-    if (v)
-      headers.set(k, v)
+    // adding '/' before eventSource because hono enforce prefix all paths starting with a '/', ref: https://github.com/honojs/hono/blob/main/src/utils/url.ts#L91
+    return new Request(`http://localhost/${getEventSource(event)}`, requestInit)
   }
+  else {
+    const queryString = extractQueryString(event)
+    const domainName
+      = event.requestContext && 'domainName' in event.requestContext
+        ? event.requestContext.domainName
+        : event.headers.host
+    const path = isProxyEventV2(event) ? event.rawPath : event.path
+    const urlPath = `https://${domainName}${path}`
+    const url = queryString ? `${urlPath}?${queryString}` : urlPath
 
-  const method = isProxyEventV2(event) ? event.requestContext.http.method : event.httpMethod
-  const requestInit: RequestInit = {
-    headers,
-    method,
+    const headers = new Headers()
+    getCookies(event, headers)
+    for (const [k, v] of Object.entries(event.headers)) {
+      if (v)
+        headers.set(k, v)
+    }
+
+    const method = isProxyEventV2(event) ? event.requestContext.http.method : event.httpMethod
+    const requestInit: RequestInit = {
+      headers,
+      method,
+    }
+
+    if (event.body)
+      requestInit.body = event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body
+
+    return new Request(url, requestInit)
   }
-
-  if (event.body)
-    requestInit.body = event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body
-
-  return new Request(url, requestInit)
 }
 
-function extractQueryString(event: LambdaEvent) {
+function extractQueryString(event: LambdaRequestEvent) {
   return isProxyEventV2(event)
     ? event.rawQueryString
     : Object.entries(event.queryStringParameters || {})
@@ -237,6 +290,28 @@ function setCookies(event: LambdaEvent, res: Response, result: APIGatewayProxyRe
 
 function isProxyEventV2(event: LambdaEvent): event is APIGatewayProxyEventV2 {
   return Object.prototype.hasOwnProperty.call(event, 'rawPath')
+}
+
+function isTriggerEvent(event: LambdaEvent): event is LambdaTriggerEvent {
+  try {
+    return Boolean(getEventSource(event as LambdaTriggerEvent))
+  }
+  catch {
+    return false
+  }
+}
+
+export function getEventSource(event: LambdaTriggerEvent): string {
+  const eventSource = (
+    (event as CommonRecordsTriggerEvent)?.Records?.[0]?.eventSource
+    || (event as eventSourceTriggerEvent)?.eventSource
+    || (event as sourceTriggerEvent)?.source
+  )
+
+  if (!eventSource)
+    throw new Error('Invalid `event`: not LambdaTriggerEvent')
+
+  return eventSource
 }
 
 export function isContentTypeBinary(contentType: string) {
