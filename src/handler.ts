@@ -82,10 +82,6 @@ export interface APIGatewayProxyResult {
   isBase64Encoded: boolean
 }
 
-function getRequestContext(event: LambdaEvent): ApiGatewayRequestContext | ApiGatewayRequestContextV2 | ALBRequestContext {
-  return event.requestContext
-}
-
 async function streamToNodeStream(reader: ReadableStreamDefaultReader<Uint8Array>, writer: NodeJS.WritableStream) {
   let readResult = await reader.read()
   while (!readResult.done) {
@@ -104,11 +100,9 @@ export function streamHandle<
     async (event: LambdaEvent, responseStream: NodeJS.WritableStream, context: LambdaContext) => {
       try {
         const req = createRequest(event)
-        const requestContext = getRequestContext(event)
 
         const res = await app.fetch(req, {
           event,
-          requestContext,
           context,
         })
 
@@ -145,11 +139,9 @@ export function handle<E extends Env = Env, S extends Schema = {}, BasePath exte
     lambdaContext?: LambdaContext,
   ): Promise<APIGatewayProxyResult> => {
     const req = createRequest(event)
-    const requestContext = getRequestContext(event)
 
     const res = await app.fetch(req, {
       event,
-      requestContext,
       lambdaContext,
     })
 
