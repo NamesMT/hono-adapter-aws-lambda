@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.1.0-1711141011.89eedae
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.0-1711140225.4b7ce09...v0.1.0-1711141011.89eedae)
+
+### 📖 Documentation
+
+- **README:** Update ([89eedae](https://github.com/namesmt/hono-adapter-aws-lambda/commit/89eedae))
+
+### 🏡 Chore
+
+- Should publish under a namespace ([c4a1c6f](https://github.com/namesmt/hono-adapter-aws-lambda/commit/c4a1c6f))
+- Adjust linked parts after renaming to namespace ([5dec7df](https://github.com/namesmt/hono-adapter-aws-lambda/commit/5dec7df))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.1.0-1711140225.4b7ce09
 
 
