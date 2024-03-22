@@ -1,5 +1,5 @@
 {
-  "name": "starter-ts",
+  "name": "hono-adapter-aws-lambda",
   "type": "module",
   "version": "0.0.0",
   "packageManager": "pnpm@8.15.4",
@@ -7,13 +7,13 @@
   "author": "NamesMT <dangquoctrung123@gmail.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/namesmt",
-  "homepage": "https://github.com/namesmt/starter-ts#readme",
+  "homepage": "https://github.com/namesmt/hono-adapter-aws-lambda#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/namesmt/starter-ts.git"
+    "url": "git+https://github.com/namesmt/hono-adapter-aws-lambda.git"
   },
-  "bugs": "https://github.com/namesmt/starter-ts/issues",
-  "keywords": [],
+  "bugs": "https://github.com/namesmt/hono-adapter-aws-lambda/issues",
+  "keywords": ["hono", "adapter", "aws", "lambda"],
   "sideEffects": false,
   "exports": {
     ".": {

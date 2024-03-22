@@ -1,10 +1,10 @@
-# starter-ts [![NPM version](https://img.shields.io/npm/v/starter-ts?color=a1b858&label=)](https://www.npmjs.com/package/starter-ts)
+# hono-adapter-aws-lambda [![NPM version](https://img.shields.io/npm/v/hono-adapter-aws-lambda?color=a1b858&label=)](https://www.npmjs.com/package/hono-adapter-aws-lambda)
 
-**starter-ts** is my starter/boilerplate for typescript projects.  
+**hono-adapter-aws-lambda** is my starter/boilerplate for typescript projects.  
 This template assumes you are using Linux, or the included Dev Container.
 
 ### Notes (remove this section when you use the template)
-#### * Do a global replace for `starter-ts` and `NamesMT`
+#### * Do a global replace for `hono-adapter-aws-lambda` and `NamesMT`
 
 #### * I'm heavily inspired by [antfu](https://github.com/antfu) and [UnJS](https://github.com/unjs), some notable things:
 - [antfu/ni](https://github.com/antfu/ni)
@@ -25,19 +25,19 @@ This template assumes you are using Linux, or the included Dev Container.
 ### Install package:
 ```sh
 # npm
-npm install starter-ts
+npm install hono-adapter-aws-lambda
 
 # yarn
-yarn add starter-ts
+yarn add hono-adapter-aws-lambda
 
 # pnpm (recommended)
-pnpm install starter-ts
+pnpm install hono-adapter-aws-lambda
 ```
 
 ### Import:
 ```ts
 // ESM
-import { hello } from 'starter-ts'
+import { hello } from 'hono-adapter-aws-lambda'
 ```
 
 ## Roadmap

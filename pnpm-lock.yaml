@@ -63,7 +63,7 @@ importers:
       nodemon:
         specifier: ^3.0.1
         version: 3.0.2
-      starter-ts:
+      hono-adapter-aws-lambda:
         specifier: workspace:^
         version: link:..
       vite:
