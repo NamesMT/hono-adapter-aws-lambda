@@ -1,5 +1,5 @@
 {
-  "name": "hono-adapter-aws-lambda",
+  "name": "@namesmt/hono-adapter-aws-lambda",
   "type": "module",
   "version": "0.1.0-1711140225.4b7ce09",
   "packageManager": "pnpm@8.15.5",
