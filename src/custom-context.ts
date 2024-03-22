@@ -62,8 +62,8 @@ interface Authorizer {
 export interface ApiGatewayRequestContextV2 {
   accountId: string
   apiId: string
-  authentication: null
-  authorizer: Authorizer
+  authentication?: null
+  authorizer?: Authorizer
   domainName: string
   domainPrefix: string
   http: {
