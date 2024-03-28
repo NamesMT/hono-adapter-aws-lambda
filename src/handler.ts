@@ -157,12 +157,13 @@ export function streamHandle<
           headers: Object.fromEntries(res.headers.entries()),
         }
 
-        if (res.body) {
-          await streamToNodeStream(
-            res.body.getReader(),
-            awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata),
-          )
-        }
+        // Update response stream
+        responseStream = awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata)
+
+        if (res.body)
+          await streamToNodeStream(res.body.getReader(), responseStream)
+        else
+          responseStream.write('')
       }
       catch (error) {
         console.error('Error processing request:', error)
