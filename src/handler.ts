@@ -3,13 +3,17 @@ import { Buffer } from 'node:buffer'
 import type { ReadableStreamDefaultReader } from 'node:stream/web'
 import type { Env, Hono, Schema } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
-
+import { mergePath } from 'hono/utils/url'
+import { SmartRouter } from 'hono/router/smart-router'
+import { RegExpRouter } from 'hono/router/reg-exp-router'
+import { LinearRouter } from 'hono/router/linear-router'
+import { PatternRouter } from 'hono/router/pattern-router'
+import type { LambdaContext } from './types'
 import type {
   ALBRequestContext,
   ApiGatewayRequestContext,
   ApiGatewayRequestContextV2,
 } from './custom-context'
-import type { LambdaContext } from './types'
 
 // @ts-expect-error CryptoKey missing
 globalThis.crypto ??= crypto
@@ -219,14 +223,57 @@ async function createResult(event: LambdaEvent, res: Response): Promise<APIGatew
   return result
 }
 
+export const triggerPathUUID = globalThis.crypto.randomUUID()
+
+export function getTriggerPath(path: string) {
+  return mergePath(triggerPathUUID, path)
+}
+
+function fixTriggerPath(path: string) {
+  const uuidIndex = path.indexOf(triggerPathUUID)
+  return uuidIndex ? path.substring(uuidIndex - 1) : path
+}
+
+function fixTriggerRegExpPath(re: RegExp) {
+  const s = re.source
+  const uuidIndex = s.indexOf(triggerPathUUID)
+  return uuidIndex ? new RegExp(`^\\/${s.substring(uuidIndex)}`) : re
+}
+
+export function fixTriggerRoutes(app: Hono) {
+  app.routes.forEach(r => r.path = fixTriggerPath(r.path))
+
+  const appRouter = app.router
+  // For Array<[method, path, handler]>
+  if (appRouter instanceof SmartRouter || appRouter instanceof LinearRouter) {
+    appRouter.routes?.filter(r => r[0] === 'TRIGGER').forEach(r => r[1] = fixTriggerPath(r[1]))
+  }
+  // For Array<[path: RegExp, method, handler]>
+  else if (appRouter instanceof PatternRouter) {
+    // @ts-expect-error .routes is private
+    appRouter.routes?.filter(r => r[1] === 'TRIGGER').forEach(r => r[0] = fixTriggerRegExpPath(r[0]))
+  }
+  // For Record<method, Record<path, handlers>>
+  else if (appRouter instanceof RegExpRouter) {
+    if (appRouter.routes?.TRIGGER) {
+      for (const path of Object.keys(appRouter.routes.TRIGGER)) {
+        if (path.includes(triggerPathUUID)) {
+          appRouter.routes.TRIGGER[fixTriggerPath(path)] = appRouter.routes.TRIGGER[path]
+          delete appRouter.routes.TRIGGER[path]
+        }
+      }
+    }
+  }
+  else { throw new TypeError('Unsupported router') }
+}
+
 function createRequest(event: LambdaEvent) {
   if (isTriggerEvent(event)) {
     const requestInit: RequestInit = {
       method: 'TRIGGER',
     }
-
-    // adding '/' before eventSource because hono enforce prefix all paths starting with a '/', ref: https://github.com/honojs/hono/blob/main/src/utils/url.ts#L91
-    return new Request(`http://localhost/${getEventSource(event)}`, requestInit)
+    const path = getTriggerPath(getEventSource(event))
+    return new Request(`http://127.0.0.1${path}`, requestInit)
   }
   else {
     const queryString = extractQueryString(event)
