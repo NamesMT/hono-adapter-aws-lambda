@@ -4,7 +4,9 @@
 
 ## Features & Roadmap
 - [x] add router support for trigger events.
-  - > Support is added but `route()` group doesn't work yet [#1](https://github.com/NamesMT/hono-adapter-aws-lambda/issues/1)
+  - > Support is added with a few notices
+    - Must use `getTriggerPath()` when defining a trigger route
+    - Must use `fixTriggerRoute()` to support basePath / grouping
   - I.e, support for S3, SQS, etc. triggers, which would also support a simpler cross-function call interface.
 
 ## Usage
