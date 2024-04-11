@@ -28,5 +28,18 @@ pnpm install @namesmt/hono-adapter-aws-lambda
 import { handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
 ```
 
+### Examples:
+Fast example of accepting an S3 trigger event
+```ts
+import { handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
+
+interface Bindings {
+  event: { Records: Array<{ eventName: string }> }
+}
+const app = new Hono<{ Bindings: Bindings }>()
+
+app.on('TRIGGER', getTriggerPath('aws:s3'), c => c.text(c.env.event.Records[0].eventName))
+```
+
 ## License
 [MIT](./LICENSE) License © 2024 [NamesMT](https://github.com/NamesMT)
