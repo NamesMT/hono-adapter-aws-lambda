@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.1.0
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.0-1711616965.7e91467...v0.1.0)
+
+### 📖 Documentation
+
+- **README:** Add quick example to use trigger events ([8917e57](https://github.com/namesmt/hono-adapter-aws-lambda/commit/8917e57))
+
+### 🏡 Chore
+
+- Use `unjs/renovate-config` ([bde6b99](https://github.com/namesmt/hono-adapter-aws-lambda/commit/bde6b99))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+- Trung Dang ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.1.0-1711616965.7e91467
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.0-1711141011.89eedae...v0.1.0-1711616965.7e91467)
