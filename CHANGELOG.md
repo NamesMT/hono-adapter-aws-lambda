@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.1.1
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.0...v0.1.1)
+
+### 🚀 Enhancements
+
+- Align with hono@4.2.5 ([d52c916](https://github.com/namesmt/hono-adapter-aws-lambda/commit/d52c916))
+- Align with hono@4.2.6, implements triggerProcessor ([3ace017](https://github.com/namesmt/hono-adapter-aws-lambda/commit/3ace017))
+
+### 🏡 Chore
+
+- Update deps ([b85af91](https://github.com/namesmt/hono-adapter-aws-lambda/commit/b85af91))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.1.0
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.0-1711616965.7e91467...v0.1.0)
