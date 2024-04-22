@@ -147,8 +147,9 @@ export function streamHandle<
 >(app: Hono<E, S, BasePath>) {
   return awslambda.streamifyResponse(
     async (event: LambdaEvent, responseStream: NodeJS.WritableStream, context: LambdaContext) => {
+      const processor = getProcessor(event)
       try {
-        const req = createRequest(event)
+        const req = processor.createRequest(event)
 
         const res = await app.fetch(req, {
           event,
@@ -188,41 +189,200 @@ export function handle<E extends Env = Env, S extends Schema = {}, BasePath exte
     event: LambdaEvent,
     lambdaContext?: LambdaContext,
   ): Promise<APIGatewayProxyResult> => {
-    const req = createRequest(event)
+    const processor = getProcessor(event)
+
+    const req = processor.createRequest(event)
 
     const res = await app.fetch(req, {
       event,
       lambdaContext,
     })
 
-    return createResult(event, res)
+    return processor.createResult(event, res)
   }
 }
 
-async function createResult(event: LambdaEvent, res: Response): Promise<APIGatewayProxyResult> {
-  const contentType = res.headers.get('content-type')
-  let isBase64Encoded = !!(contentType && isContentTypeBinary(contentType))
+abstract class EventProcessor<E extends LambdaEvent> {
+  protected abstract getPath(event: E): string
 
-  if (!isBase64Encoded) {
-    const contentEncoding = res.headers.get('content-encoding')
-    isBase64Encoded = isContentEncodingBinary(contentEncoding)
+  protected abstract getMethod(event: E): string
+
+  protected abstract getQueryString(event: E): string
+
+  protected abstract getCookies(event: E, headers: Headers): void
+
+  protected abstract setCookiesToResult(result: APIGatewayProxyResult, cookies: string[]): void
+
+  createRequest(event: E): Request {
+    // createRequest will be overwritten and handled by triggerProcessor
+    event = event as Exclude<E, LambdaTriggerEvent>
+
+    const queryString = this.getQueryString(event)
+    const domainName
+      = event.requestContext && 'domainName' in event.requestContext
+        ? event.requestContext.domainName
+        : event.headers?.host ?? event.multiValueHeaders?.host?.[0]
+    const path = this.getPath(event)
+    const urlPath = `https://${domainName}${path}`
+    const url = queryString ? `${urlPath}?${queryString}` : urlPath
+
+    const headers = new Headers()
+    this.getCookies(event, headers)
+    if (event.headers) {
+      for (const [k, v] of Object.entries(event.headers)) {
+        if (v)
+          headers.set(k, v)
+      }
+    }
+    if (event.multiValueHeaders) {
+      for (const [k, values] of Object.entries(event.multiValueHeaders)) {
+        if (values)
+          values.forEach(v => headers.append(k, v))
+      }
+    }
+
+    const method = this.getMethod(event)
+    const requestInit: RequestInit = {
+      headers,
+      method,
+    }
+
+    if (event.body)
+      requestInit.body = event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body
+
+    return new Request(url, requestInit)
   }
 
-  const body = isBase64Encoded ? encodeBase64(await res.arrayBuffer()) : await res.text()
+  async createResult(event: E, res: Response): Promise<APIGatewayProxyResult> {
+    const contentType = res.headers.get('content-type')
+    let isBase64Encoded = !!(contentType && isContentTypeBinary(contentType))
 
-  const result: APIGatewayProxyResult = {
-    body,
-    headers: {},
-    statusCode: res.status,
-    isBase64Encoded,
+    if (!isBase64Encoded) {
+      const contentEncoding = res.headers.get('content-encoding')
+      isBase64Encoded = isContentEncodingBinary(contentEncoding)
+    }
+
+    const body = isBase64Encoded ? encodeBase64(await res.arrayBuffer()) : await res.text()
+
+    const result: APIGatewayProxyResult = {
+      body,
+      headers: {},
+      statusCode: res.status,
+      isBase64Encoded,
+    }
+
+    this.setCookies(event, res, result)
+    res.headers.forEach((value, key) => {
+      result.headers[key] = value
+    })
+
+    return result
   }
 
-  setCookies(event, res, result)
-  res.headers.forEach((value, key) => {
-    result.headers[key] = value
-  })
+  setCookies = (event: LambdaEvent, res: Response, result: APIGatewayProxyResult) => {
+    if (res.headers.has('set-cookie')) {
+      const cookies = res.headers.get('set-cookie')?.split(', ')
+      if (Array.isArray(cookies)) {
+        this.setCookiesToResult(result, cookies)
+        res.headers.delete('set-cookie')
+      }
+    }
+  }
+}
 
-  return result
+const triggerProcessor = new (class EventV2Processor extends EventProcessor<LambdaTriggerEvent> {
+  protected getPath(_event: LambdaTriggerEvent): string {
+    return ''
+  }
+
+  protected getMethod(_event: LambdaTriggerEvent): string {
+    return ''
+  }
+
+  protected getQueryString(_event: LambdaTriggerEvent): string {
+    return ''
+  }
+
+  protected getCookies(_event: LambdaTriggerEvent, _headers: Headers): void {
+  }
+
+  protected setCookiesToResult(result: APIGatewayProxyResult, cookies: string[]): void {
+    result.cookies = cookies
+  }
+
+  createRequest(event: LambdaTriggerEvent): Request {
+    const requestInit: RequestInit = {
+      method: 'TRIGGER',
+    }
+    const path = getTriggerPath(getEventSource(event))
+    return new Request(`http://127.0.0.1${path}`, requestInit)
+  }
+})()
+
+const v2Processor = new (class EventV2Processor extends EventProcessor<APIGatewayProxyEventV2> {
+  protected getPath(event: APIGatewayProxyEventV2): string {
+    return event.rawPath
+  }
+
+  protected getMethod(event: APIGatewayProxyEventV2): string {
+    return event.requestContext.http.method
+  }
+
+  protected getQueryString(event: APIGatewayProxyEventV2): string {
+    return event.rawQueryString
+  }
+
+  protected getCookies(event: APIGatewayProxyEventV2, headers: Headers): void {
+    if (Array.isArray(event.cookies))
+      headers.set('Cookie', event.cookies.join('; '))
+  }
+
+  protected setCookiesToResult(result: APIGatewayProxyResult, cookies: string[]): void {
+    result.cookies = cookies
+  }
+})()
+
+const v1Processor = new (class EventV1Processor extends EventProcessor<
+  Exclude<LambdaEvent, APIGatewayProxyEventV2 | LambdaTriggerEvent>
+> {
+  protected getPath(event: Exclude<LambdaEvent, APIGatewayProxyEventV2 | LambdaTriggerEvent>): string {
+    return event.path
+  }
+
+  protected getMethod(event: Exclude<LambdaEvent, APIGatewayProxyEventV2 | LambdaTriggerEvent>): string {
+    return event.httpMethod
+  }
+
+  protected getQueryString(event: Exclude<LambdaEvent, APIGatewayProxyEventV2 | LambdaTriggerEvent>): string {
+    return Object.entries(event.queryStringParameters || {})
+      .filter(([, value]) => value)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&')
+  }
+
+  protected getCookies(
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    event: Exclude<LambdaEvent, APIGatewayProxyEventV2 | LambdaTriggerEvent>,
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    headers: Headers,
+  ): void {
+    // nop
+  }
+
+  protected setCookiesToResult(result: APIGatewayProxyResult, cookies: string[]): void {
+    result.multiValueHeaders = {
+      'set-cookie': cookies,
+    }
+  }
+})()
+
+function getProcessor(event: LambdaEvent): EventProcessor<LambdaEvent> {
+  if (isTriggerEvent(event))
+    return triggerProcessor
+  else if (isProxyEventV2(event))
+    return v2Processor
+  else
+    return v1Processor
 }
 
 export const triggerPathUUID = globalThis.crypto.randomUUID()
@@ -267,83 +427,6 @@ export function fixTriggerRoutes(app: Hono) {
     }
   }
   else { throw new TypeError('Unsupported router') }
-}
-
-function createRequest(event: LambdaEvent) {
-  if (isTriggerEvent(event)) {
-    const requestInit: RequestInit = {
-      method: 'TRIGGER',
-    }
-    const path = getTriggerPath(getEventSource(event))
-    return new Request(`http://127.0.0.1${path}`, requestInit)
-  }
-  else {
-    const queryString = extractQueryString(event)
-    const domainName
-      = event.requestContext && 'domainName' in event.requestContext
-        ? event.requestContext.domainName
-        : event.headers?.host ?? event.multiValueHeaders?.host?.[0]
-    const path = isProxyEventV2(event) ? event.rawPath : event.path
-    const urlPath = `https://${domainName}${path}`
-    const url = queryString ? `${urlPath}?${queryString}` : urlPath
-
-    const headers = new Headers()
-    getCookies(event, headers)
-    if (event.headers) {
-      for (const [k, v] of Object.entries(event.headers)) {
-        if (v)
-          headers.set(k, v)
-      }
-    }
-    if (event.multiValueHeaders) {
-      for (const [k, values] of Object.entries(event.multiValueHeaders)) {
-        if (values)
-          values.forEach(v => headers.append(k, v))
-      }
-    }
-
-    const method = isProxyEventV2(event) ? event.requestContext.http.method : event.httpMethod
-    const requestInit: RequestInit = {
-      headers,
-      method,
-    }
-
-    if (event.body)
-      requestInit.body = event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body
-
-    return new Request(url, requestInit)
-  }
-}
-
-function extractQueryString(event: LambdaRequestEvent) {
-  return isProxyEventV2(event)
-    ? event.rawQueryString
-    : Object.entries(event.queryStringParameters || {})
-      .filter(([, value]) => value)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&')
-}
-
-function getCookies(event: LambdaEvent, headers: Headers) {
-  if (isProxyEventV2(event) && Array.isArray(event.cookies))
-    headers.set('Cookie', event.cookies.join('; '))
-}
-
-function setCookies(event: LambdaEvent, res: Response, result: APIGatewayProxyResult) {
-  if (res.headers.has('set-cookie')) {
-    const cookies = res.headers.get('set-cookie')?.split(', ')
-    if (Array.isArray(cookies)) {
-      if (isProxyEventV2(event)) {
-        result.cookies = cookies
-      }
-      else {
-        result.multiValueHeaders = {
-          'set-cookie': cookies,
-        }
-      }
-      res.headers.delete('set-cookie')
-    }
-  }
 }
 
 function isProxyEventV2(event: LambdaEvent): event is APIGatewayProxyEventV2 {
