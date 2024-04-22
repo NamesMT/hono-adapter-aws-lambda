@@ -385,7 +385,8 @@ function getProcessor(event: LambdaEvent): EventProcessor<LambdaEvent> {
     return v1Processor
 }
 
-export const triggerPathUUID = globalThis.crypto.randomUUID()
+// eslint-disable-next-line node/prefer-global/process
+export const triggerPathUUID = `${process.env.SECRET_SALT}-${Date.now()}-${globalThis.crypto.randomUUID()}`
 
 export function getTriggerPath(path: string) {
   return mergePath(triggerPathUUID, path)
