@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.1.2
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.1...v0.1.2)
+
+### 🚀 Enhancements
+
+- Add `ALBProcessor` and refactor TriggerProcessor + abstract classes ([0124671](https://github.com/namesmt/hono-adapter-aws-lambda/commit/0124671))
+
+### 💅 Refactors
+
+- Improve security against brute-force attack ([f340e45](https://github.com/namesmt/hono-adapter-aws-lambda/commit/f340e45))
+
+### 🏡 Chore
+
+- Align with honojs/hono#c95e135 ([a7a91a6](https://github.com/namesmt/hono-adapter-aws-lambda/commit/a7a91a6))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.1.1
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.0...v0.1.1)

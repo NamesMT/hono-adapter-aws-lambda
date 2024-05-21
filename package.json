@@ -1,7 +1,7 @@
 {
   "name": "@namesmt/hono-adapter-aws-lambda",
   "type": "module",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "packageManager": "pnpm@9.0.5",
   "description": "",
   "author": "NamesMT <dangquoctrung123@gmail.com>",
