@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.1.3
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.2...v0.1.3)
+
+### 🏡 Chore
+
+- Align with honojs/hono#a437161 ([eb62ce0](https://github.com/namesmt/hono-adapter-aws-lambda/commit/eb62ce0))
+- Update deps ([30fb157](https://github.com/namesmt/hono-adapter-aws-lambda/commit/30fb157))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.1.2
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.1...v0.1.2)
