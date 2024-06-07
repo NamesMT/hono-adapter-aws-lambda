@@ -9,13 +9,17 @@ export default antfu(
   },
   {
     rules: {
+      // Disable forcing interface instead of type
       'ts/ban-types': 'off',
+      // Allow trailing space in comments, for possible JSDoc formattings
       'style/no-trailing-spaces': ['error', { ignoreComments: true }],
+      // Relaxes inline statements a bit
       'style/max-statements-per-line': ['error', { max: 2 }],
     },
   },
+  // Allow trailing space for markdown formatting
   {
-    files: ['*.md'],
+    files: ['**/*.md'],
     rules: {
       'style/no-trailing-spaces': 'off',
     },

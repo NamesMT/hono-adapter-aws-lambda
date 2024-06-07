@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { Hono } from 'hono'
 import { klona } from 'klona'
 import sampleEvent from './sample-event-v2.json'
-import { fixTriggerRoutes, getTriggerPath, handle, streamHandle } from '~/handler'
+import { fixTriggerRoutes, getTriggerPath, handle } from '~/handler'
 
 function makeSampleEvent({ path = 'path', method = 'GET' }) {
   const event = klona(sampleEvent)
