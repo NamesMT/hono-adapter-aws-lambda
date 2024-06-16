@@ -160,10 +160,20 @@ export function streamHandle<
           context,
         })
 
+        const headers: Record<string, string> = {}
+        const cookies: string[] = []
+        res.headers.forEach((value, name) => {
+          if (name === 'set-cookie')
+            cookies.push(value)
+          else
+            headers[name] = value
+        })
+
         // Check content type
         const httpResponseMetadata = {
           statusCode: res.status,
-          headers: Object.fromEntries(res.headers.entries()),
+          headers,
+          cookies,
         }
 
         // Update response stream
