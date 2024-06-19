@@ -2,11 +2,6 @@ import crypto from 'node:crypto'
 import type { ReadableStreamDefaultReader } from 'node:stream/web'
 import type { Env, Hono, Schema } from 'hono'
 import { decodeBase64, encodeBase64 } from 'hono/utils/encode'
-import { mergePath } from 'hono/utils/url'
-import { SmartRouter } from 'hono/router/smart-router'
-import { RegExpRouter } from 'hono/router/reg-exp-router'
-import { LinearRouter } from 'hono/router/linear-router'
-import { PatternRouter } from 'hono/router/pattern-router'
 import type {
   ALBRequestContext,
   ApiGatewayRequestContext,
@@ -14,6 +9,8 @@ import type {
   Handler,
   LambdaContext,
 } from './types'
+import type { LambdaTriggerEvent } from './trigger'
+import { isTriggerEvent, triggerProcessor } from './trigger'
 
 // @ts-expect-error CryptoKey missing
 globalThis.crypto ??= crypto
@@ -78,48 +75,6 @@ export interface ALBProxyEvent {
     [parameterKey: string]: string[]
   }
   requestContext: ALBRequestContext
-}
-
-// When calling Lambda through triggers, i.e: S3, SES, SQS.
-// Ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-services.html
-export type LambdaTriggerEvent = CommonRecordsTriggerEvent | eventSourceTriggerEvent | sourceTriggerEvent
-
-/**
- * "Records.eventSource", A commonly-seen common trigger event schema, which is nested under Records
- * 
- * Used by S3, SES, SQS, DynamoDB
- */
-export interface CommonRecordsTriggerEvent {
-  Records: Array<{
-    eventSource: string
-    eventSourceARN?: string
-    eventVersion?: string
-    eventTime?: string
-    eventName?: string
-    awsRegion?: string
-    [key: string]: any
-  }>
-}
-
-/**
- * "eventSource" trigger event schema
- * 
- * Used by DocumentDB, Kafka, MQ
- */
-export interface eventSourceTriggerEvent {
-  eventSource: string
-  eventSourceARN?: string
-  [key: string]: any
-}
-
-/**
- * "source" trigger event schema
- * 
- * Used by EC2, EventBridge
- */
-export interface sourceTriggerEvent {
-  source: string
-  [key: string]: any
 }
 
 export interface APIGatewayProxyResult {
@@ -216,7 +171,7 @@ export function handle<E extends Env = Env, S extends Schema = {}, BasePath exte
   }
 }
 
-abstract class EventProcessor<E extends LambdaEvent> {
+export abstract class EventProcessor<E extends LambdaEvent> {
   abstract createRequest(event: E): Request
 
   abstract createResult(event: E, res: Response): Promise<any>
@@ -304,44 +259,6 @@ abstract class RequestEventProcessor<E extends LambdaRequestEvent> extends Event
     }
   }
 }
-
-const triggerProcessor = new (class TriggerEventProcessor extends EventProcessor<LambdaTriggerEvent> {
-  createRequest(event: LambdaTriggerEvent): Request {
-    const requestInit: RequestInit = {
-      method: 'TRIGGER',
-    }
-    const path = getTriggerPath(getEventSource(event))
-    return new Request(`http://127.0.0.1${path}`, requestInit)
-  }
-
-  async createResult(event: LambdaTriggerEvent, res: Response): Promise<any> {
-    const contentType = res.headers.get('content-type')
-    let isBase64Encoded = !!(contentType && isContentTypeBinary(contentType))
-
-    if (!isBase64Encoded) {
-      const contentEncoding = res.headers.get('content-encoding')
-      isBase64Encoded = isContentEncodingBinary(contentEncoding)
-    }
-
-    const body = isBase64Encoded ? encodeBase64(await res.arrayBuffer()) : await res.text()
-
-    if (res.headers.get('return-body'))
-      return body
-
-    const result: APIGatewayProxyResult = {
-      body,
-      headers: {},
-      statusCode: res.status,
-      isBase64Encoded,
-    }
-
-    res.headers.forEach((value, key) => {
-      result.headers[key] = value
-    })
-
-    return result
-  }
-})()
 
 class EventV2Processor extends RequestEventProcessor<APIGatewayProxyEventV2> {
   protected getPath(event: APIGatewayProxyEventV2): string {
@@ -545,73 +462,6 @@ export function getProcessor(event: LambdaEvent): EventProcessor<LambdaEvent> {
     return v2Processor
 
   return v1Processor
-}
-
-// eslint-disable-next-line node/prefer-global/process
-export const triggerPathUUID = `${process.env.SECRET_SALT}-${Date.now()}-${globalThis.crypto.randomUUID()}`
-
-export function getTriggerPath(path: string) {
-  return mergePath(triggerPathUUID, path)
-}
-
-function fixTriggerPath(path: string) {
-  const uuidIndex = path.indexOf(triggerPathUUID)
-  return uuidIndex ? path.substring(uuidIndex - 1) : path
-}
-
-function fixTriggerRegExpPath(re: RegExp) {
-  const s = re.source
-  const uuidIndex = s.indexOf(triggerPathUUID)
-  return uuidIndex ? new RegExp(`^\\/${s.substring(uuidIndex)}`) : re
-}
-
-export function fixTriggerRoutes(app: Hono) {
-  app.routes.forEach(r => r.path = fixTriggerPath(r.path))
-
-  const appRouter = app.router
-  // For Array<[method, path, handler]>
-  if (appRouter instanceof SmartRouter || appRouter instanceof LinearRouter) {
-    appRouter.routes?.filter(r => r[0] === 'TRIGGER').forEach(r => r[1] = fixTriggerPath(r[1]))
-  }
-  // For Array<[path: RegExp, method, handler]>
-  else if (appRouter instanceof PatternRouter) {
-    // @ts-expect-error .routes is private
-    appRouter.routes?.filter(r => r[1] === 'TRIGGER').forEach(r => r[0] = fixTriggerRegExpPath(r[0]))
-  }
-  // For Record<method, Record<path, handlers>>
-  else if (appRouter instanceof RegExpRouter) {
-    if (appRouter.routes?.TRIGGER) {
-      for (const path of Object.keys(appRouter.routes.TRIGGER)) {
-        if (path.includes(triggerPathUUID)) {
-          appRouter.routes.TRIGGER[fixTriggerPath(path)] = appRouter.routes.TRIGGER[path]
-          delete appRouter.routes.TRIGGER[path]
-        }
-      }
-    }
-  }
-  else { throw new TypeError('Unsupported router') }
-}
-
-export function getEventSource(event: LambdaTriggerEvent): string {
-  const eventSource = (
-    (event as CommonRecordsTriggerEvent)?.Records?.[0]?.eventSource
-    || (event as eventSourceTriggerEvent)?.eventSource
-    || (event as sourceTriggerEvent)?.source
-  )
-
-  if (!eventSource)
-    throw new Error('Invalid `event`: not LambdaTriggerEvent')
-
-  return eventSource
-}
-
-function isTriggerEvent(event: LambdaEvent): event is LambdaTriggerEvent {
-  try {
-    return Boolean(getEventSource(event as LambdaTriggerEvent))
-  }
-  catch {
-    return false
-  }
 }
 
 function isProxyEventALB(event: LambdaEvent): event is ALBProxyEvent {

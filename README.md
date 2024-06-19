@@ -10,10 +10,11 @@
 
 ## Features & Roadmap
 - [x] add router support for trigger events.
-  - > Support is added with a few notices
-    - Must use `getTriggerPath()` when defining a trigger route
-    - Must use `fixTriggerRoute()` to support basePath / grouping
-  - I.e, support for S3, SQS, etc. triggers, which would also support a simpler cross-function call interface.
+  - > I.e, support for S3, SQS, etc. triggers, which would also support a simpler cross-function call interface.
+  - ~~Support is added with a few notices~~
+    - ~~Must use `getTriggerPath()` when defining a trigger route~~
+    - ~~Must use `fixTriggerRoute()` to support basePath / grouping~~
+  - A refactor of the trigger routing support have been released, it now supports multiple handler ids on an eventSource, uses a factory pattern, and decoupled the trigger context (middlewares, env bindings) from our main Hono app, see #10 for more information.
 
 ## Usage
 ### Install package:
@@ -31,15 +32,18 @@ import { handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
 ### Examples:
 Fast example of accepting an S3 trigger event
 ```ts
-import { getTriggerPath, handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
+import { createTriggerFactory, handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
 
 interface Bindings {
   event: { Records: Array<{ eventName: string }> }
 }
 const app = new Hono<{ Bindings: Bindings }>()
+const triggerFactory = createTriggerFactory(app)
 
-app.on('TRIGGER', getTriggerPath('aws:s3'), c => c.text(c.env.event.Records[0].eventName))
+triggerFactory.on('aws:s3', '$!', c => c.text(c.env.event.Records[0].eventName))
 ```
+
+See some more examples in the test file: [test/index.test.ts](test/index.test.ts)
 
 ## License
 [MIT](./LICENSE) License © 2024 [NamesMT](https://github.com/NamesMT)

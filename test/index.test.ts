@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { Hono } from 'hono'
 import { klona } from 'klona'
 import sampleEvent from './sample-event-v2.json'
-import { fixTriggerRoutes, getTriggerPath, handle } from '~/handler'
+import type { LambdaEvent } from '~/handler'
+import { handle } from '~/handler'
+import { createTriggerFactory } from '~/trigger'
 
 function makeSampleEvent({ path = 'path', method = 'GET' }) {
   const event = klona(sampleEvent)
@@ -11,7 +13,7 @@ function makeSampleEvent({ path = 'path', method = 'GET' }) {
   event.routeKey = event.requestContext.routeKey = `${method} ${path}`
   event.requestContext.http.method = method
 
-  return event
+  return event as any as LambdaEvent
 }
 
 function makeTriggerEvent(eventSource: string) {
@@ -24,11 +26,21 @@ describe('basic', () => {
   describe('normal handler', () => {
     describe('simple usage', () => {
       const app = new Hono()
+      const triggerFactory = createTriggerFactory(app)
+
+      let shouldBeChanged = ''
 
       // Registering routes
       app.get('/', c => c.text('Hello Hono!'))
       app.get('/hi', c => c.text('Hi Hono!'))
-      app.on('TRIGGER', getTriggerPath('test:simple'), c => c.text('Hello Trigger Event!'))
+      triggerFactory.on('test:rootTakeover', '$!', c => c.text('Hello Trigger Event!'))
+      triggerFactory.on('test:rootReturn', '$=', c => c.text('Hello Trigger Event!'))
+      triggerFactory.on('test:rootReturn', 'changeLet', (c) => {
+        shouldBeChanged = 'changed'
+        return c.text('')
+      })
+      triggerFactory.on('test:resObj', 'a1', c => c.text('Hello from a1'))
+      triggerFactory.on('test:resObj', 'b2', c => c.text('Hello from b2'))
 
       // Create handler
       const handler = handle(app)
@@ -36,49 +48,10 @@ describe('basic', () => {
       it('should process some basic events flawlessly 💅', async () => {
         expect(handler(makeSampleEvent({ path: '/' }))).resolves.toMatchObject({ body: 'Hello Hono!' })
         expect(handler(makeSampleEvent({ path: '/hi' }))).resolves.toMatchObject({ body: 'Hi Hono!' })
-        expect(handler(makeTriggerEvent('test:simple'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
-      })
-    })
-
-    describe('with basePath (fixTriggerRoutes())', () => {
-      const app = new Hono().basePath('/based')
-
-      // Registering routes
-      app.get('/', c => c.text('Hello Hono!'))
-      app.get('/hi', c => c.text('Hi Hono!'))
-      app.on('TRIGGER', getTriggerPath('test:simple'), c => c.text('Hello Trigger Event!'))
-
-      // Create handler
-      fixTriggerRoutes(app)
-      const handler = handle(app)
-
-      it('should process some basic events flawlessly 💅', async () => {
-        expect(handler(makeSampleEvent({ path: '/based' }))).resolves.toMatchObject({ body: 'Hello Hono!' })
-        expect(handler(makeSampleEvent({ path: '/based/hi' }))).resolves.toMatchObject({ body: 'Hi Hono!' })
-        expect(handler(makeTriggerEvent('test:simple'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
-      })
-    })
-
-    // TODO: support trigger events in route grouping
-    describe('with route grouping (fixTriggerRoutes())', () => {
-      const grouped = new Hono()
-
-      // Registering routes
-      grouped.get('/', c => c.text('Hello Hono!'))
-      grouped.get('/hi', c => c.text('Hi Hono!'))
-      grouped.on('TRIGGER', getTriggerPath('test:simple'), c => c.text('Hello Trigger Event!'))
-
-      const app = new Hono()
-      app.route('/grouped', grouped)
-
-      // Create handler
-      fixTriggerRoutes(app)
-      const handler = handle(app)
-
-      it('should process some basic events flawlessly 💅', async () => {
-        expect(handler(makeSampleEvent({ path: '/grouped' }))).resolves.toMatchObject({ body: 'Hello Hono!' })
-        expect(handler(makeSampleEvent({ path: '/grouped/hi' }))).resolves.toMatchObject({ body: 'Hi Hono!' })
-        expect(handler(makeTriggerEvent('test:simple'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
+        expect(handler(makeTriggerEvent('test:rootTakeover'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
+        expect(handler(makeTriggerEvent('test:rootReturn'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
+        expect(shouldBeChanged).toBe('changed')
+        expect(handler(makeTriggerEvent('test:resObj'))).resolves.toMatchObject({ body: JSON.stringify({ a1: 'Hello from a1', b2: 'Hello from b2' }) })
       })
     })
   })
