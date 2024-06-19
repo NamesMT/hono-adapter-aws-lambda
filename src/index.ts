@@ -17,4 +17,4 @@ export {
   getTriggerPath,
   TriggerFactory,
   triggerPathUUID,
-} from '~/trigger'
+} from './trigger'
