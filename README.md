@@ -14,7 +14,7 @@
   - ~~Support is added with a few notices~~
     - ~~Must use `getTriggerPath()` when defining a trigger route~~
     - ~~Must use `fixTriggerRoute()` to support basePath / grouping~~
-  - A refactor of the trigger routing support have been released, it now supports multiple handler ids on an eventSource, uses a factory pattern, and decoupled the trigger context (middlewares, env bindings) from our main Hono app, see #10 for more information.
+  - A refactor of the trigger routing support have been released, it now supports multiple routes on the same eventSource, uses a factory pattern, and decoupled the trigger context (middlewares, env bindings) from our main Hono app, see [#10](https://github.com/NamesMT/hono-adapter-aws-lambda/issues/10) for more information.
 
 ## Usage
 ### Install package:
