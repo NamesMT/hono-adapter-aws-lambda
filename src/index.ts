@@ -3,7 +3,7 @@
  * AWS Lambda Adapter for Hono.
  */
 
-export { handle, streamHandle } from './handler'
+export { handle, streamHandle, getTriggerPath, fixTriggerRoutes } from './handler'
 export type { APIGatewayProxyResult, LambdaEvent } from './handler'
 export type {
   ApiGatewayRequestContext,
