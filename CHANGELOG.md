@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.1.6
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.5...v0.1.6)
+
+### 🩹 Fixes
+
+- Exports and docs ([80ed50f](https://github.com/namesmt/hono-adapter-aws-lambda/commit/80ed50f))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.1.5
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.4...v0.1.5)
