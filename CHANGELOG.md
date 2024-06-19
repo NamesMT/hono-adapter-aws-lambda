@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.2.0-1718818726.a66ea14
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.6...v0.2.0-1718818726.a66ea14)
+
+### 🚀 Enhancements
+
+- ⚠️  Major refactor of trigger events support ([a66ea14](https://github.com/namesmt/hono-adapter-aws-lambda/commit/a66ea14))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Major refactor of trigger events support ([a66ea14](https://github.com/namesmt/hono-adapter-aws-lambda/commit/a66ea14))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.1.6
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.5...v0.1.6)
