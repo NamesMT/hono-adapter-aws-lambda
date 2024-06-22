@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import type { H } from 'hono/types'
 import { mergePath } from 'hono/utils/url'
 import { encodeBase64 } from 'hono/utils/encode'
-import type { LambdaEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
+import type { CommonTriggerEventsMap, LambdaEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
 import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 
 import type { EventProcessor } from './common'
@@ -149,10 +149,13 @@ export function createTriggerFactory<E extends Env, A extends Hono<any, any, '/'
 }
 
 export function getEventSource(event: LambdaTriggerEvent): string {
-  const eventSource = (
-    (event as CommonRecordsTriggerEvent)?.Records?.[0]?.eventSource
-    || (event as eventSourceTriggerEvent)?.eventSource
-    || (event as sourceTriggerEvent)?.source
+  const eventSource = (false
+    || (event as CommonTriggerEventsMap['eventSource'])?.eventSource
+    || (event as CommonTriggerEventsMap['Name'])?.Name
+    || (event as CommonTriggerEventsMap['Records.eventSource'])?.Records?.[0]?.eventSource
+    || (event as CommonTriggerEventsMap['Records.EventSource'])?.Records?.[0]?.EventSource
+    || (event as CommonTriggerEventsMap['source'])?.source
+    || (event as CommonTriggerEventsMap['triggerSource'])?.triggerSource
   )
 
   if (!eventSource)
