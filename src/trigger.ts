@@ -9,44 +9,6 @@ import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 import type { EventProcessor } from './common'
 import { isContentEncodingBinary, isContentTypeBinary } from './common'
 
-/**
- * "Records.eventSource", A commonly-seen common trigger event schema, which is nested under Records
- * 
- * Used by S3, SES, SQS, DynamoDB
- */
-export interface CommonRecordsTriggerEvent {
-  Records: Array<{
-    eventSource: string
-    eventSourceARN?: string
-    eventVersion?: string
-    eventTime?: string
-    eventName?: string
-    awsRegion?: string
-    [key: string]: any
-  }>
-}
-
-/**
- * "eventSource" trigger event schema
- * 
- * Used by DocumentDB, Kafka, MQ
- */
-export interface eventSourceTriggerEvent {
-  eventSource: string
-  eventSourceARN?: string
-  [key: string]: any
-}
-
-/**
- * "source" trigger event schema
- * 
- * Used by EC2, EventBridge
- */
-export interface sourceTriggerEvent {
-  source: string
-  [key: string]: any
-}
-
 const METHOD = 'TRIGGER'
 
 export class TriggerFactory<IE extends Env, HE extends Env> {
