@@ -53,6 +53,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
+    "@namesmt/utils-lambda": "^0.0.2",
+    "@types/aws-lambda": "^8.10.140",
     "consola": "^3.2.3",
     "hono": "^4.4.4",
     "std-env": "^3.7.0"

@@ -15,7 +15,9 @@ export default defineBuildConfig({
   ],
   declaration: 'node16',
   clean: true,
+  externals: ['aws-lambda'],
   rollup: {
+    inlineDependencies: true,
     esbuild: {
       // minify: true,
     },

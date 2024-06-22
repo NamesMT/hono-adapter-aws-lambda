@@ -3,12 +3,11 @@ import { Hono } from 'hono'
 import type { H } from 'hono/types'
 import { mergePath } from 'hono/utils/url'
 import { encodeBase64 } from 'hono/utils/encode'
-import type { APIGatewayProxyResult, EventProcessor, LambdaEvent } from './handler'
-import { isContentEncodingBinary, isContentTypeBinary } from './handler'
+import type { LambdaEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
+import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 
-// When calling Lambda through triggers, i.e: S3, SES, SQS.
-// Ref: https://docs.aws.amazon.com/lambda/latest/dg/lambda-services.html
-export type LambdaTriggerEvent = CommonRecordsTriggerEvent | eventSourceTriggerEvent | sourceTriggerEvent
+import type { EventProcessor } from './common'
+import { isContentEncodingBinary, isContentTypeBinary } from './common'
 
 /**
  * "Records.eventSource", A commonly-seen common trigger event schema, which is nested under Records
@@ -120,12 +119,12 @@ class TriggerEventProcessor implements EventProcessor<LambdaTriggerEvent> {
     if (res.headers.get('return-body'))
       return body
 
-    const result: APIGatewayProxyResult = {
+    const result = {
       body,
-      headers: {},
+      headers: {} as NonNullable<APIGatewayProxyStructuredResultV2['headers']>,
       statusCode: res.status,
       isBase64Encoded,
-    }
+    } satisfies APIGatewayProxyStructuredResultV2
 
     res.headers.forEach((value, key) => {
       result.headers[key] = value
