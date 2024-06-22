@@ -1,6 +1,42 @@
 # Changelog
 
 
+## v0.2.0-1719056816.4d340c2
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.0-1718818726.a66ea14...v0.2.0-1719056816.4d340c2)
+
+### 🚀 Enhancements
+
+- **getEventSource:** Support all common trigger event interfaces ([1496b5c](https://github.com/namesmt/hono-adapter-aws-lambda/commit/1496b5c))
+- **createTriggerFactory:** Add default `Env.Bindings` ([c14b734](https://github.com/namesmt/hono-adapter-aws-lambda/commit/c14b734))
+
+### 🩹 Fixes
+
+- Workaround unbuild alias implicit external bug unjs/unbuild#201 ([#201](https://github.com/namesmt/hono-adapter-aws-lambda/issues/201))
+
+### 💅 Refactors
+
+- ⚠️  Major restructuring ([47dbfca](https://github.com/namesmt/hono-adapter-aws-lambda/commit/47dbfca))
+- Remove local definitions of trigger interfaces ([34ef55a](https://github.com/namesmt/hono-adapter-aws-lambda/commit/34ef55a))
+- Relocation some code ([40a8f48](https://github.com/namesmt/hono-adapter-aws-lambda/commit/40a8f48))
+
+### 📖 Documentation
+
+- README corrections ([0936e23](https://github.com/namesmt/hono-adapter-aws-lambda/commit/0936e23))
+- **README:** Update example ([820cdb9](https://github.com/namesmt/hono-adapter-aws-lambda/commit/820cdb9))
+
+### ✅ Tests
+
+- Update ([4d340c2](https://github.com/namesmt/hono-adapter-aws-lambda/commit/4d340c2))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Major restructuring ([47dbfca](https://github.com/namesmt/hono-adapter-aws-lambda/commit/47dbfca))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.0-1718818726.a66ea14
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.1.6...v0.2.0-1718818726.a66ea14)
