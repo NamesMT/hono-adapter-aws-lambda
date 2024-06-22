@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { Hono } from 'hono'
 import { klona } from 'klona'
+import type { LambdaRequestEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
 import sampleEvent from './sample-event-v2.json'
-import type { LambdaEvent } from '~/handler'
 import { handle } from '~/handler'
 import { createTriggerFactory } from '~/trigger'
 
@@ -13,13 +13,13 @@ function makeSampleEvent({ path = 'path', method = 'GET' }) {
   event.routeKey = event.requestContext.routeKey = `${method} ${path}`
   event.requestContext.http.method = method
 
-  return event as any as LambdaEvent
+  return event as LambdaRequestEvent
 }
 
 function makeTriggerEvent(eventSource: string) {
   const event = { eventSource }
 
-  return event
+  return event as LambdaTriggerEvent
 }
 
 describe('basic', () => {
