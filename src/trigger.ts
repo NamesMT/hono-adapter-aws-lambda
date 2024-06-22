@@ -64,7 +64,7 @@ export class TriggerFactory<IE extends Env, HE extends Env> {
 type ExtractHonoEnv<A extends Hono> = A extends Hono<infer E> ? E : never
 
 export function createTriggerFactory<E extends Env, A extends Hono<any, any, '/'>>(app: A) {
-  return new TriggerFactory<E, ExtractHonoEnv<A>>(app)
+  return new TriggerFactory<E extends unknown ? { Bindings: { event: LambdaTriggerEvent } } : E, ExtractHonoEnv<A>>(app)
 }
 
 class TriggerEventProcessor implements EventProcessor<LambdaTriggerEvent> {
