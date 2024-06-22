@@ -61,6 +61,12 @@ export class TriggerFactory<IE extends Env, HE extends Env> {
   }
 }
 
+type ExtractHonoEnv<A extends Hono> = A extends Hono<infer E> ? E : never
+
+export function createTriggerFactory<E extends Env, A extends Hono<any, any, '/'>>(app: A) {
+  return new TriggerFactory<E, ExtractHonoEnv<A>>(app)
+}
+
 class TriggerEventProcessor implements EventProcessor<LambdaTriggerEvent> {
   createRequest(event: LambdaTriggerEvent): Request {
     const path = getTriggerPath(getEventSource(event))
@@ -102,12 +108,6 @@ export const triggerPathUUID = `${process.env.SECRET_SALT}-${Date.now()}-${globa
 
 export function getTriggerPath(path: string) {
   return mergePath(triggerPathUUID, path)
-}
-
-type ExtractHonoEnv<A extends Hono> = A extends Hono<infer E> ? E : never
-
-export function createTriggerFactory<E extends Env, A extends Hono<any, any, '/'>>(app: A) {
-  return new TriggerFactory<E, ExtractHonoEnv<A>>(app)
 }
 
 export function getEventSource(event: LambdaTriggerEvent): string {
