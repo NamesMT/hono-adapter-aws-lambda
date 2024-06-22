@@ -32,6 +32,7 @@ import { handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
 ### Examples:
 Fast example of accepting an S3 trigger event
 ```ts
+import type { S3Event } from 'aws-lambda' // You need to install `@types/aws-lambda`
 import { createTriggerFactory, handle, streamHandle } from '@namesmt/hono-adapter-aws-lambda'
 
 interface Bindings {
@@ -40,7 +41,7 @@ interface Bindings {
 const app = new Hono<{ Bindings: Bindings }>()
 const triggerFactory = createTriggerFactory(app)
 
-triggerFactory.on('aws:s3', '$!', c => c.text(c.env.event.Records[0].eventName))
+triggerFactory.on('aws:s3', '$!', c => c.text((c.env.event as S3Event).Records[0].eventName))
 ```
 
 See some more examples in the test file: [test/index.test.ts](test/index.test.ts)
