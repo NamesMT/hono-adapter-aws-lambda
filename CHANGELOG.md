@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.0
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.0-1719056816.4d340c2...v0.2.0)
+
+### 🚀 Enhancements
+
+- Exports `LambdaEvent`, `LambdaContext` ([07e6790](https://github.com/namesmt/hono-adapter-aws-lambda/commit/07e6790))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.0-1719056816.4d340c2
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.0-1718818726.a66ea14...v0.2.0-1719056816.4d340c2)
