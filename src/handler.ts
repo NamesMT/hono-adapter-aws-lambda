@@ -2,9 +2,8 @@ import crypto from 'node:crypto'
 import type { ReadableStreamDefaultReader } from 'node:stream/web'
 import type { Env, Hono, Schema } from 'hono'
 import type { LambdaEvent } from '@namesmt/utils-lambda'
-import type { APIGatewayProxyResult, Handler } from 'aws-lambda'
 
-import type { LambdaContext } from './types'
+import type { LambdaContext, LambdaHandler, LambdaHandlerResult } from './types'
 
 import { getProcessor } from './common'
 
@@ -24,7 +23,7 @@ export function streamHandle<
   E extends Env = Env,
   S extends Schema = {},
   BasePath extends string = '/',
->(app: Hono<E, S, BasePath>): Handler {
+>(app: Hono<E, S, BasePath>): LambdaHandler<LambdaEvent> {
   // @ts-expect-error awslambda is not a standard API
   return awslambda.streamifyResponse(
     async (event: LambdaEvent, responseStream: NodeJS.WritableStream, context: LambdaContext) => {
@@ -78,7 +77,7 @@ export function streamHandle<
 /**
  * Accepts events from API Gateway/ELB(`APIGatewayProxyEvent`) and directly through Function Url(`APIGatewayProxyEventV2`)
  */
-export function handle<E extends Env = Env, S extends Schema = {}, BasePath extends string = '/'>(app: Hono<E, S, BasePath>): ((event: LambdaEvent, lambdaContext?: LambdaContext) => Promise<APIGatewayProxyResult>) {
+export function handle<E extends Env = Env, S extends Schema = {}, BasePath extends string = '/'>(app: Hono<E, S, BasePath>): LambdaHandler<LambdaEvent, LambdaHandlerResult> {
   return async (event, lambdaContext?) => {
     const processor = getProcessor(event)
 

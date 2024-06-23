@@ -4,6 +4,7 @@ import type { ALBEvent, APIGatewayProxyEvent, APIGatewayProxyEventV2, APIGateway
 
 import type { EventProcessor } from './common'
 import { isContentEncodingBinary, isContentTypeBinary } from './common'
+import type { LambdaHandlerResult } from './types'
 
 abstract class RequestEventProcessor<E extends LambdaRequestEvent> implements EventProcessor<E> {
   protected abstract getPath(event: E): string
@@ -18,7 +19,7 @@ abstract class RequestEventProcessor<E extends LambdaRequestEvent> implements Ev
 
   protected abstract setCookiesToResult(
     event: E,
-    result: APIGatewayProxyResult | APIGatewayProxyStructuredResultV2,
+    result: LambdaHandlerResult,
     cookies: string[]
   ): void
 
@@ -47,7 +48,7 @@ abstract class RequestEventProcessor<E extends LambdaRequestEvent> implements Ev
     return new Request(url, requestInit)
   }
 
-  async createResult(event: E, res: Response): Promise<APIGatewayProxyResult | APIGatewayProxyStructuredResultV2> {
+  async createResult(event: E, res: Response): Promise<LambdaHandlerResult> {
     const contentType = res.headers.get('content-type')
     let isBase64Encoded = !!(contentType && isContentTypeBinary(contentType))
 
@@ -81,7 +82,7 @@ abstract class RequestEventProcessor<E extends LambdaRequestEvent> implements Ev
     return result
   }
 
-  setCookies(event: E, res: Response, result: APIGatewayProxyResult | APIGatewayProxyStructuredResultV2) {
+  setCookies(event: E, res: Response, result: LambdaHandlerResult) {
     if (res.headers.has('set-cookie')) {
       const cookies = res.headers.get('set-cookie')?.split(', ')
       if (Array.isArray(cookies)) {
