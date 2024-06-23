@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.2
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.1...v0.2.2)
+
+### 🌊 Types
+
+- Export `LambdaTriggerEvent`, `LambdaRequestEvent` ([d037768](https://github.com/namesmt/hono-adapter-aws-lambda/commit/d037768))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.1
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.0...v0.2.1)
