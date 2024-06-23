@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.1
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.0...v0.2.1)
+
+### 🌊 Types
+
+- Refactor and export necessary types, fix `ts2742` ([130d155](https://github.com/namesmt/hono-adapter-aws-lambda/commit/130d155))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.0
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.0-1719056816.4d340c2...v0.2.0)
