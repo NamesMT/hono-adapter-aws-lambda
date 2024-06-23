@@ -2,7 +2,9 @@ import crypto from 'node:crypto'
 import type { ReadableStreamDefaultReader } from 'node:stream/web'
 import type { Env, Hono, Schema } from 'hono'
 import type { LambdaEvent } from '@namesmt/utils-lambda'
-import type { APIGatewayProxyResult, Handler, Context as LambdaContext } from 'aws-lambda'
+import type { APIGatewayProxyResult, Handler } from 'aws-lambda'
+
+import type { LambdaContext } from './types'
 
 import { getProcessor } from './common'
 

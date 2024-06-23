@@ -4,7 +4,7 @@
  */
 
 export { handle, streamHandle } from './handler'
-
+export * from './types'
 export {
   createTriggerFactory,
   getTriggerPath,
