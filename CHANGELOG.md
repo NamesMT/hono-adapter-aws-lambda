@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.3
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.2...v0.2.3)
+
+### 🩹 Fixes
+
+- Set cookies with comma is bugged ([eb79aa9](https://github.com/namesmt/hono-adapter-aws-lambda/commit/eb79aa9))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.2
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.1...v0.2.2)
