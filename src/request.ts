@@ -84,7 +84,10 @@ abstract class RequestEventProcessor<E extends LambdaRequestEvent> implements Ev
 
   setCookies(event: E, res: Response, result: LambdaHandlerResult) {
     if (res.headers.has('set-cookie')) {
-      const cookies = res.headers.get('set-cookie')?.split(', ')
+      const cookies = res.headers.getSetCookie
+        ? res.headers.getSetCookie()
+        : Array.from(res.headers.entries()).filter(([k]) => k === 'set-cookie').map(([, v]) => v)
+
       if (Array.isArray(cookies)) {
         this.setCookiesToResult(event, result, cookies)
         res.headers.delete('set-cookie')
