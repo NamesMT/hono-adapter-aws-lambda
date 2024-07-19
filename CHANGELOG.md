@@ -1,6 +1,39 @@
 # Changelog
 
 
+## v0.2.5
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.3...v0.2.5)
+
+### 🚀 Enhancements
+
+- Add `$HAAL-returnBody` special return ([6cd75e6](https://github.com/namesmt/hono-adapter-aws-lambda/commit/6cd75e6))
+
+### 💅 Refactors
+
+- **handler:** Code splitting ([fbb8b40](https://github.com/namesmt/hono-adapter-aws-lambda/commit/fbb8b40))
+
+### 🌊 Types
+
+- Declare global awslambda stream APIs ([4d28a32](https://github.com/namesmt/hono-adapter-aws-lambda/commit/4d28a32))
+
+### 🏡 Chore
+
+- **trigger:** ⚠️  Remove `return-body` special return ([f373710](https://github.com/namesmt/hono-adapter-aws-lambda/commit/f373710))
+- Update deps, lockfile ([79479cf](https://github.com/namesmt/hono-adapter-aws-lambda/commit/79479cf))
+
+### ✅ Tests
+
+- Fix types error ([b43c8ad](https://github.com/namesmt/hono-adapter-aws-lambda/commit/b43c8ad))
+
+#### ⚠️ Breaking Changes
+
+- **trigger:** ⚠️  Remove `return-body` special return ([f373710](https://github.com/namesmt/hono-adapter-aws-lambda/commit/f373710))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.3
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.2...v0.2.3)
