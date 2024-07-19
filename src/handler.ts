@@ -1,8 +1,11 @@
 import crypto from 'node:crypto'
 import type { ReadableStreamDefaultReader } from 'node:stream/web'
+import { Readable } from 'node:stream'
+import { pipeline } from 'node:stream/promises'
 import type { Env, Hono, Schema } from 'hono'
 import type { LambdaEvent } from '@namesmt/utils-lambda'
 
+import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 import type { LambdaContext, LambdaHandler, LambdaHandlerResult } from './types'
 
 import { getProcessor } from './common'
@@ -17,6 +20,19 @@ async function writableWriteReadable(writer: NodeJS.WritableStream, reader: Read
     readResult = await reader.read()
   }
   writer.end()
+}
+
+function stringToReadable(str: string): Readable {
+  // eslint-disable-next-line node/prefer-global/buffer
+  return Readable.from(Buffer.from(str))
+}
+
+function resultToStreamMetadata(result: APIGatewayProxyStructuredResultV2) {
+  return {
+    statusCode: result.statusCode,
+    headers: result.headers,
+    cookies: result.cookies,
+  }
 }
 
 function responseToStreamMetadata(res: Response) {
@@ -54,14 +70,26 @@ export function streamHandle<
           context,
         })
 
-        // Update response stream metadata
-        responseStream = awslambda.HttpResponseStream.from(responseStream, responseToStreamMetadata(res))
+        if (res.headers.get('$HAAL-returnBody')) {
+          const result = (await res.json()) as APIGatewayProxyStructuredResultV2
 
-        if (res.body) {
-          await writableWriteReadable(responseStream, res.body.getReader())
+          // Update response stream metadata
+          responseStream = awslambda.HttpResponseStream.from(responseStream, resultToStreamMetadata(result))
+
+          const bodyStream = stringToReadable(result.body || '')
+
+          await pipeline(bodyStream, responseStream)
         }
         else {
-          responseStream.write('')
+          // Update response stream metadata
+          responseStream = awslambda.HttpResponseStream.from(responseStream, responseToStreamMetadata(res))
+
+          if (res.body) {
+            await writableWriteReadable(responseStream, res.body.getReader())
+          }
+          else {
+            responseStream.write('')
+          }
         }
       }
       catch (error) {
@@ -88,6 +116,9 @@ export function handle<E extends Env = Env, S extends Schema = {}, BasePath exte
       event,
       lambdaContext,
     })
+
+    if (res.headers.get('$HAAL-returnBody'))
+      return (await res.json()) as LambdaHandlerResult
 
     return processor.createResult(event, res)
   }
