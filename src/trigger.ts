@@ -84,9 +84,6 @@ class TriggerEventProcessor implements EventProcessor<LambdaTriggerEvent> {
 
     const body = isBase64Encoded ? encodeBase64(await res.arrayBuffer()) : await res.text()
 
-    if (res.headers.get('return-body'))
-      return body
-
     const result = {
       body,
       headers: {} as NonNullable<APIGatewayProxyStructuredResultV2['headers']>,
