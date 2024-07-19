@@ -10,13 +10,31 @@ import { getProcessor } from './common'
 // @ts-expect-error CryptoKey missing
 globalThis.crypto ??= crypto
 
-async function streamToNodeStream(reader: ReadableStreamDefaultReader<Uint8Array>, writer: NodeJS.WritableStream): Promise<void> {
+async function writableWriteReadable(writer: NodeJS.WritableStream, reader: ReadableStreamDefaultReader<Uint8Array>): Promise<void> {
   let readResult = await reader.read()
   while (!readResult.done) {
     writer.write(readResult.value)
     readResult = await reader.read()
   }
   writer.end()
+}
+
+function responseToStreamMetadata(res: Response) {
+  const headers: Record<string, string> = {}
+  const cookies: string[] = []
+
+  res.headers.forEach((value, name) => {
+    if (name === 'set-cookie')
+      cookies.push(value)
+    else
+      headers[name] = value
+  })
+
+  return {
+    statusCode: res.status,
+    headers,
+    cookies,
+  }
 }
 
 export function streamHandle<
@@ -36,28 +54,11 @@ export function streamHandle<
           context,
         })
 
-        const headers: Record<string, string> = {}
-        const cookies: string[] = []
-        res.headers.forEach((value, name) => {
-          if (name === 'set-cookie')
-            cookies.push(value)
-          else
-            headers[name] = value
-        })
-
-        // Check content type
-        const httpResponseMetadata = {
-          statusCode: res.status,
-          headers,
-          cookies,
-        }
-
-        // Update response stream
-        // @ts-expect-error awslambda is not a standard API
-        responseStream = awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata)
+        // Update response stream metadata
+        responseStream = awslambda.HttpResponseStream.from(responseStream, responseToStreamMetadata(res))
 
         if (res.body) {
-          await streamToNodeStream(res.body.getReader(), responseStream)
+          await writableWriteReadable(responseStream, res.body.getReader())
         }
         else {
           responseStream.write('')
