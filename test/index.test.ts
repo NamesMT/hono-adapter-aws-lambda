@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { Hono } from 'hono'
 import { klona } from 'klona'
-import type { LambdaRequestEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
+import type { LambdaEvent, LambdaRequestEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
+
 import sampleEvent from './sample-event-v2.json'
-import { handle } from '~/handler'
+
 import { createTriggerFactory } from '~/trigger'
+import type { LambdaHandlerResult } from '~/types'
+import { handle } from '~/handler'
+
+type ShimSimpleHandler = (event: LambdaEvent) => Promise<LambdaHandlerResult>
 
 function makeSampleEvent({ path = 'path', method = 'GET' }) {
   const event = klona(sampleEvent)
@@ -43,7 +48,7 @@ describe('basic', () => {
       triggerFactory.on('test:resObj', 'b2', c => c.text('Hello from b2'))
 
       // Create handler
-      const handler = handle(app)
+      const handler = handle(app) as ShimSimpleHandler
 
       it('should process some basic events flawlessly 💅', async () => {
         expect(handler(makeSampleEvent({ path: '/' }))).resolves.toMatchObject({ body: 'Hello Hono!' })
