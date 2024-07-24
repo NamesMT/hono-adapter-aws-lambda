@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.6
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.5...v0.2.6)
+
+### 🌊 Types
+
+- **TriggerFactory:** Relax default `Variables` type ([c5c7e62](https://github.com/namesmt/hono-adapter-aws-lambda/commit/c5c7e62))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.5
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.3...v0.2.5)
