@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.7
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.6...v0.2.7)
+
+### 🏡 Chore
+
+- No longer release under namespace ([fa4a76b](https://github.com/namesmt/hono-adapter-aws-lambda/commit/fa4a76b))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.6
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.5...v0.2.6)
