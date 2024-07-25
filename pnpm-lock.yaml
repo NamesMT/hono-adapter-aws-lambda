@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@namesmt/utils-lambda':
-        specifier: ^0.0.3
-        version: 0.0.3
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/aws-lambda':
         specifier: ^8.10.142
         version: 8.10.142
@@ -844,8 +844,8 @@ packages:
     resolution: {integrity: sha512-f5DRIOZf7wxogefH03RjMPMdBF7ADTWUMoOs9kaJo06EfwF+aFhMZMDZxHg/Xe12hptN9xoZjGso2fdjapBRIA==}
     engines: {node: '>=10'}
 
-  '@namesmt/utils-lambda@0.0.3':
-    resolution: {integrity: sha512-uE/cjQ2useMhQIA4oGIVeh547YbWg8e9JDq7A1pWq7hLoHxXhURIZ+2U58KWtrlWuYtH5A5xpS5b7Yi6Cv3/Jw==}
+  '@namesmt/utils-lambda@0.1.0':
+    resolution: {integrity: sha512-8px7Vge1wGRB+7KnF4DL8zYuAFxTFu+/40TkH04zPhjrdmr6oQk8FJ9SggefnUxAghh2xQUk7lNzm5Xn1/SLxg==}
     engines: {node: '>=20.13.1'}
 
   '@namesmt/utils@0.4.1':
@@ -4285,7 +4285,7 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.0.8
 
-  '@namesmt/utils-lambda@0.0.3':
+  '@namesmt/utils-lambda@0.1.0':
     dependencies:
       '@aws-sdk/client-lambda': 3.616.0
       '@namesmt/utils': 0.4.1
