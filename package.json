@@ -2,7 +2,7 @@
   "name": "hono-adapter-aws-lambda",
   "type": "module",
   "version": "0.2.7",
-  "packageManager": "pnpm@9.5.0",
+  "packageManager": "pnpm@9.6.0",
   "description": "",
   "author": "NamesMT <dangquoctrung123@gmail.com>",
   "license": "MIT",
@@ -52,26 +52,30 @@
     "prepare": "simple-git-hooks",
     "prepublishOnly": "pnpm run build"
   },
+  "peerDependencies": {
+    "hono": ">=4.5.1"
+  },
+  "peerDependenciesMeta": {
+    "hono": {
+      "optional": false
+    }
+  },
   "dependencies": {
-    "@namesmt/utils-lambda": "^0.0.2",
-    "@types/aws-lambda": "^8.10.141",
-    "consola": "^3.2.3",
-    "hono": "^4.5.0",
-    "std-env": "^3.7.0"
+    "@namesmt/utils-lambda": "^0.0.3",
+    "@types/aws-lambda": "^8.10.142"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.23.0",
-    "@types/node": "^20.14.11",
-    "@unocss/eslint-plugin": "^0.61.5",
-    "@vitest/coverage-v8": "^2.0.3",
+    "@antfu/eslint-config": "^2.23.2",
+    "@types/node": "^20.14.12",
+    "@vitest/coverage-v8": "^2.0.4",
     "eslint": "^9.7.0",
     "klona": "^2.0.6",
     "lint-staged": "^15.2.7",
     "simple-git-hooks": "^2.11.1",
     "tsx": "^4.16.2",
-    "typescript": "^5.5.3",
+    "typescript": "^5.5.4",
     "unbuild": "^2.0.0",
-    "vitest": "^2.0.3"
+    "vitest": "^2.0.4"
   },
   "pnpm": {
     "overrides": {
