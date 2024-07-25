@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.2.8
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.7...v0.2.8)
+
+### 📖 Documentation
+
+- **README:** Update ([9e1c1f8](https://github.com/namesmt/hono-adapter-aws-lambda/commit/9e1c1f8))
+
+### 🏡 Chore
+
+- Maintain deps, lockfile ([340a427](https://github.com/namesmt/hono-adapter-aws-lambda/commit/340a427))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.7
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.6...v0.2.7)
