@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.0.0
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.8...v1.0.0)
+
+### 🏡 Chore
+
+- Bump `@namesmt/utils-lambda` ([601d7e6](https://github.com/namesmt/hono-adapter-aws-lambda/commit/601d7e6))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v0.2.8
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v0.2.7...v0.2.8)
