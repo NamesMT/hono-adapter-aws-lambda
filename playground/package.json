@@ -6,7 +6,7 @@
     "dev": "nodemon -w '../src/**/*.ts' -w 'main.ts' -e .ts -x vite"
   },
   "devDependencies": {
-    "@namesmt/hono-adapter-aws-lambda": "workspace:^",
+    "hono-adapter-aws-lambda": "workspace:^",
     "nodemon": "^3.1.4",
     "vite": "^5.3.4",
     "vite-plugin-inspect": "^0.8.5"
