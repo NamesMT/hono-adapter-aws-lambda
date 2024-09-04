@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v1.1.0
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.0.1...v1.1.0)
+
+### 🚀 Enhancements
+
+- `HandleConfigOptions` and `easyRouteKey` ([b9b7044](https://github.com/namesmt/hono-adapter-aws-lambda/commit/b9b7044))
+
+### 🏡 Chore
+
+- **eslint:** Disable `ts/no-empty-object-type` ([d1f78fc](https://github.com/namesmt/hono-adapter-aws-lambda/commit/d1f78fc))
+
+### ✅ Tests
+
+- Adjust test for asynchronous handler case ([49bddf2](https://github.com/namesmt/hono-adapter-aws-lambda/commit/49bddf2))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v1.0.1
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.0.0...v1.0.1)
