@@ -10,6 +10,7 @@ export default antfu(
     rules: {
       // Disable forcing interface instead of type
       'ts/ban-types': 'off',
+      'ts/no-empty-object-type': 'off',
       // Allow trailing space in comments, for possible JSDoc formattings
       'style/no-trailing-spaces': ['error', { ignoreComments: true }],
       // Relaxes inline statements a bit
