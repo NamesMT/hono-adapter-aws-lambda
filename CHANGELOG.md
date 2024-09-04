@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.2.0
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.1.0...v1.2.0)
+
+### 🚀 Enhancements
+
+- **minimalEvent:** Also set `content-type` header ([0402ec4](https://github.com/namesmt/hono-adapter-aws-lambda/commit/0402ec4))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v1.1.0
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.0.1...v1.1.0)
