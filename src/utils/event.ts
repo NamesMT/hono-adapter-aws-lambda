@@ -14,6 +14,9 @@ export function minimalEvent(method: string, path: string, baseEvent?: APIGatewa
     routeKey: '',
   }
 
+  event.headers ??= {}
+  event.headers['content-type'] ??= 'application/json'
+
   event.routeKey = event.requestContext.routeKey = `${method} ${path}`
   event.requestContext.http.method = method
   event.rawPath = event.requestContext.http.path = path
