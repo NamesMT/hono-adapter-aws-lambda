@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.3.0
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.2.0...v1.3.0)
+
+### 🚀 Enhancements
+
+- **minimalEvent:** Also stringify body if method is not GET/HEAD ([a0b33ac](https://github.com/namesmt/hono-adapter-aws-lambda/commit/a0b33ac))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](http://github.com/NamesMT))
+
 ## v1.2.0
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.1.0...v1.2.0)
