@@ -34,7 +34,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=18.20.3"
+    "node": ">=20.18.0"
   },
   "scripts": {
     "start": "NODE_ENV=dev tsx src/index.ts",
