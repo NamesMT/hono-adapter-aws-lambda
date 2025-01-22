@@ -65,7 +65,7 @@
     "@types/aws-lambda": "^8.10.143"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.27.1",
+    "@antfu/eslint-config": "^3.16.0",
     "@types/node": "^20.16.1",
     "@vitest/coverage-v8": "^2.0.5",
     "eslint": "^9.9.1",
