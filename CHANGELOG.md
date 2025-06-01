@@ -1,6 +1,24 @@
 # Changelog
 
 
+## v1.3.3
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.1...v1.3.3)
+
+### 🏡 Chore
+
+- Housekeep, LLRT compat ([d3209a0](https://github.com/namesmt/hono-adapter-aws-lambda/commit/d3209a0))
+- **release:** V1.3.2 ([30bc7e8](https://github.com/namesmt/hono-adapter-aws-lambda/commit/30bc7e8))
+- ⚠️  Undocumented env rename, and use simple Math.random() for path UUID gen ([87af78d](https://github.com/namesmt/hono-adapter-aws-lambda/commit/87af78d))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Undocumented env rename, and use simple Math.random() for path UUID gen ([87af78d](https://github.com/namesmt/hono-adapter-aws-lambda/commit/87af78d))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](https://github.com/NamesMT))
+
 ## v1.3.2
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.1...v1.3.2)
