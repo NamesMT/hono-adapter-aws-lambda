@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.3.2
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.1...v1.3.2)
+
+### 🏡 Chore
+
+- Housekeep, LLRT compat ([d3209a0](https://github.com/namesmt/hono-adapter-aws-lambda/commit/d3209a0))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](https://github.com/NamesMT))
+
 ## v1.3.1
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.0...v1.3.1)
