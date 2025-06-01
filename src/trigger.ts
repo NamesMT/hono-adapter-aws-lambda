@@ -105,7 +105,7 @@ class TriggerEventProcessor implements EventProcessor<LambdaTriggerEvent> {
 export const triggerProcessor: TriggerEventProcessor = new TriggerEventProcessor()
 
 // eslint-disable-next-line node/prefer-global/process
-export const triggerPathUUID = `${process.env.SECRET_SALT}-${Date.now()}-${globalThis.crypto.randomUUID()}`
+export const triggerPathUUID = `${process.env.HONO_TRIGGER_SALT}-${Date.now()}-${Math.random()}`
 
 export function getTriggerPath(path: string) {
   return mergePath(triggerPathUUID, path)
