@@ -1,13 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import type { LambdaEvent, LambdaRequestEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
+import type { LambdaHandlerResult } from '~/types'
 import { Hono } from 'hono'
 import { klona } from 'klona'
-import type { LambdaEvent, LambdaRequestEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
 
-import sampleEvent from './sample-event-v2.json'
+import { describe, expect, it } from 'vitest'
 
-import { createTriggerFactory } from '~/trigger'
-import type { LambdaHandlerResult } from '~/types'
 import { handle } from '~/handler'
+import { createTriggerFactory } from '~/trigger'
+import sampleEvent from './sample-event-v2.json'
 
 type ShimSimpleHandler = (event: LambdaEvent) => Promise<LambdaHandlerResult>
 

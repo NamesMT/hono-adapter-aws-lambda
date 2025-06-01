@@ -4,10 +4,10 @@
  */
 
 export { handle, streamHandle } from './handler'
-export * from './types'
 export {
   createTriggerFactory,
   getTriggerPath,
   TriggerFactory,
   triggerPathUUID,
 } from './trigger'
+export * from './types'

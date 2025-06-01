@@ -1,17 +1,12 @@
-import crypto from 'node:crypto'
-import type { ReadableStreamDefaultReader } from 'node:stream/web'
-import { Readable } from 'node:stream'
-import { pipeline } from 'node:stream/promises'
-import type { Env, Hono, Schema } from 'hono'
 import type { LambdaEvent } from '@namesmt/utils-lambda'
 import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
-
+import type { Env, Hono, Schema } from 'hono'
+import type { ReadableStreamDefaultReader } from 'stream/web'
 import type { LambdaContext, LambdaHandler, LambdaHandlerResult } from './types'
+import { Readable } from 'stream'
+import { pipeline } from 'stream/promises'
 import { getProcessor } from './common'
 import { minimalEvent } from './utils/event'
-
-// @ts-expect-error CryptoKey missing
-globalThis.crypto ??= crypto
 
 async function writableWriteReadable(writer: NodeJS.WritableStream, reader: ReadableStreamDefaultReader<Uint8Array>): Promise<void> {
   let readResult = await reader.read()
@@ -67,7 +62,7 @@ export function streamHandle<
 >(app: Hono<E, S, BasePath>, handleConfig?: HandleConfigOptions): LambdaHandler<LambdaEvent> {
   // @ts-expect-error awslambda is not a standard API
   return awslambda.streamifyResponse(
-    async (event: LambdaEvent, responseStream: NodeJS.WritableStream, context: LambdaContext) => {
+    async (event, responseStream, context) => {
       await processConfig(event, context, handleConfig)
 
       const processor = getProcessor(event)

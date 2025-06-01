@@ -15,6 +15,8 @@ export default antfu(
       'style/no-trailing-spaces': ['error', { ignoreComments: true }],
       // Relaxes inline statements a bit
       'style/max-statements-per-line': ['error', { max: 2 }],
+      // Allow non `node` protocol imports for AWS LLRT
+      'unicorn/prefer-node-protocol': 'off',
     },
   },
   // Allow trailing space for markdown formatting
