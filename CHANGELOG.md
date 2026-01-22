@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v1.3.4
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.3...v1.3.4)
+
+### 🩹 Fixes
+
+- Env data was never passed down, S3 trigger example didn't work ([4aac223](https://github.com/namesmt/hono-adapter-aws-lambda/commit/4aac223))
+
+### 🏡 Chore
+
+- Update deps ([1b2ab81](https://github.com/namesmt/hono-adapter-aws-lambda/commit/1b2ab81))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](https://github.com/NamesMT))
+
 ## v1.3.3
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.1...v1.3.3)
