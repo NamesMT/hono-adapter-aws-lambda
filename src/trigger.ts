@@ -53,6 +53,7 @@ export class TriggerFactory<IE extends Env, HE extends Env> {
     if (thisEventSource[id])
       throw new Error(`Route ID "${id}" already exists for event source "${eventSource}"`)
 
+    // @ts-expect-error upstream Hono type bug
     this.internalApp.on(METHOD, `/${eventSource}/${id}`, ...handlers)
     thisEventSource[id] = true
 
