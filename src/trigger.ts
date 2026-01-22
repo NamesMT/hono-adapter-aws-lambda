@@ -28,7 +28,7 @@ export class TriggerFactory<IE extends Env, HE extends Env> {
       this.honoApp.on(METHOD, getTriggerPath(eventSource), async (c) => {
         // $!: rootTakeover, this is a special id that will return itself, bypass the execute of the rest of the ids
         if (thisEventSource['$!']) {
-          return this.internalApp.fetch(makeLocalRequest(METHOD, `/${eventSource}/$!`))
+          return this.internalApp.fetch(makeLocalRequest(METHOD, `/${eventSource}/$!`), c.env)
         }
 
         const resObj: Record<string, any> = {}
@@ -37,13 +37,13 @@ export class TriggerFactory<IE extends Env, HE extends Env> {
           if (route[0] === '$')
             continue
 
-          const res = await this.internalApp.fetch(makeLocalRequest(METHOD, `/${eventSource}/${route}`))
+          const res = await this.internalApp.fetch(makeLocalRequest(METHOD, `/${eventSource}/${route}`), c.env)
           resObj[route] = /^application\/json/.test(res.headers.get('content-type') || '') ? await res.json() : await res.text()
         }
 
         // $: rootReturn, this is a special id that will always be processed last and return itself instead of an object of all ids result.
         if (thisEventSource['$=']) {
-          return this.internalApp.fetch(makeLocalRequest(METHOD, `/${eventSource}/$=`))
+          return this.internalApp.fetch(makeLocalRequest(METHOD, `/${eventSource}/$=`), c.env)
         }
 
         return c.json(resObj)
