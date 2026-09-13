@@ -58,8 +58,6 @@ See some more examples in the test file: [test/index.test.ts](test/index.test.ts
 [npm-downloads-href]: https://npmjs.com/package/hono-adapter-aws-lambda
 [codecov-src]: https://img.shields.io/codecov/c/gh/namesmt/hono-adapter-aws-lambda/main?labelColor=18181B&color=F0DB4F
 [codecov-href]: https://codecov.io/gh/namesmt/hono-adapter-aws-lambda
-[license-src]: https://img.shields.io/github/license/namesmt/hono-adapter-aws-lambda.svg?labelColor=18181B&color=F0DB4F
-[license-href]: https://github.com/namesmt/hono-adapter-aws-lambda/blob/main/LICENSE
 [bundlejs-src]: https://img.shields.io/bundlejs/size/hono-adapter-aws-lambda?labelColor=18181B&color=F0DB4F
 [bundlejs-href]: https://bundlejs.com/?q=hono-adapter-aws-lambda
 [jsDocs-src]: https://img.shields.io/badge/Check_out-jsDocs.io---?labelColor=18181B&color=F0DB4F

@@ -3,17 +3,18 @@ import type { LambdaEvent } from '@namesmt/utils-lambda'
 import { albProcessor, isProxyEventALB, isProxyEventV2, v1Processor, v2Processor } from './request'
 import { isTriggerEvent, triggerProcessor } from './trigger'
 
+const CONTENT_TYPE_TEXT_REGEX = /^(?:text\/(?:plain|html|css|javascript|csv).*|application\/(?:.*json|.*xml).*|image\/svg\+xml.*)$/
+const CONTENT_ENCODING_BINARY_REGEX = /^(?:gzip|deflate|compress|br)/
+
 export function isContentTypeBinary(contentType: string) {
-  return !/^(?:text\/(?:plain|html|css|javascript|csv).*|application\/(?:.*json|.*xml).*|image\/svg\+xml.*)$/.test(
-    contentType,
-  )
+  return !CONTENT_TYPE_TEXT_REGEX.test(contentType)
 }
 
 export function isContentEncodingBinary(contentEncoding: string | null) {
   if (contentEncoding === null) {
     return false
   }
-  return /^(?:gzip|deflate|compress|br)/.test(contentEncoding)
+  return CONTENT_ENCODING_BINARY_REGEX.test(contentEncoding)
 }
 
 export abstract class EventProcessor<E extends LambdaEvent> {

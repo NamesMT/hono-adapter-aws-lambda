@@ -9,6 +9,7 @@ import { mergePath } from 'hono/utils/url'
 import { isContentEncodingBinary, isContentTypeBinary } from './common'
 
 const METHOD = 'TRIGGER'
+const JSON_CONTENT_TYPE_REGEX = /^application\/json/
 
 export class TriggerFactory<IE extends Env, HE extends Env> {
   private simpleRouter: Record<string, Record<string, true>> = {}
@@ -38,7 +39,7 @@ export class TriggerFactory<IE extends Env, HE extends Env> {
             continue
 
           const res = await this.internalApp.fetch(makeLocalRequest(METHOD, `/${eventSource}/${route}`), c.env)
-          resObj[route] = /^application\/json/.test(res.headers.get('content-type') || '') ? await res.json() : await res.text()
+          resObj[route] = JSON_CONTENT_TYPE_REGEX.test(res.headers.get('content-type') || '') ? await res.json() : await res.text()
         }
 
         // $: rootReturn, this is a special id that will always be processed last and return itself instead of an object of all ids result.

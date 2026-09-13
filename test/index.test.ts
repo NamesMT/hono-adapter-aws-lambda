@@ -51,13 +51,12 @@ describe('basic', () => {
       const handler = handle(app) as ShimSimpleHandler
 
       it('should process some basic events flawlessly 💅', async () => {
-        expect(handler(makeSampleEvent({ path: '/' }))).resolves.toMatchObject({ body: 'Hello Hono!' })
-        expect(handler(makeSampleEvent({ path: '/hi' }))).resolves.toMatchObject({ body: 'Hi Hono!' })
-        expect(handler(makeTriggerEvent('test:rootTakeover'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
-        expect(handler(makeTriggerEvent('test:rootReturn'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' }).then(() => {
-          expect(shouldBeChanged).toBe('changed')
-        })
-        expect(handler(makeTriggerEvent('test:resObj'))).resolves.toMatchObject({ body: JSON.stringify({ a1: 'Hello from a1', b2: 'Hello from b2' }) })
+        await expect(handler(makeSampleEvent({ path: '/' }))).resolves.toMatchObject({ body: 'Hello Hono!' })
+        await expect(handler(makeSampleEvent({ path: '/hi' }))).resolves.toMatchObject({ body: 'Hi Hono!' })
+        await expect(handler(makeTriggerEvent('test:rootTakeover'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
+        await expect(handler(makeTriggerEvent('test:rootReturn'))).resolves.toMatchObject({ body: 'Hello Trigger Event!' })
+        expect(shouldBeChanged).toBe('changed')
+        await expect(handler(makeTriggerEvent('test:resObj'))).resolves.toMatchObject({ body: JSON.stringify({ a1: 'Hello from a1', b2: 'Hello from b2' }) })
       })
     })
   })
