@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v1.3.5
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.4...v1.3.5)
+
+### 🩹 Fixes
+
+- Use relative paths (drop deprecated `baseUrl`) ([0d13e4a](https://github.com/namesmt/hono-adapter-aws-lambda/commit/0d13e4a))
+
+### 💅 Refactors
+
+- Hoist static regexes and fix test assertions ([4c58d02](https://github.com/namesmt/hono-adapter-aws-lambda/commit/4c58d02))
+
+### 🏡 Chore
+
+- Migrate to pnpm 12 ([20780a1](https://github.com/namesmt/hono-adapter-aws-lambda/commit/20780a1))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](https://github.com/NamesMT))
+
 ## v1.3.4
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.3...v1.3.4)
