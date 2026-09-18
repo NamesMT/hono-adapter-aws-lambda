@@ -5,11 +5,6 @@
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "paths": {
-      "~/*": [
-        "./src/*"
-      ]
-    },
     "types": [
       "vitest"
     ],

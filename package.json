@@ -20,6 +20,9 @@
     "lambda"
   ],
   "sideEffects": false,
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
@@ -34,20 +37,17 @@
     "dist"
   ],
   "engines": {
-    "node": ">=18.20.3"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "start": "NODE_ENV=dev tsx src/index.ts",
     "watch": "NODE_ENV=dev tsx watch src/index.ts",
-    "stub": "unbuild --stub",
     "dev": "pnpm run watch",
-    "play": "pnpm run stub && pnpm run --filter playground dev",
-    "play:useBuild": "pnpm run build && pnpm run --filter playground dev",
     "lint": "eslint .",
     "test": "vitest",
     "test:types": "tsc --noEmit --skipLibCheck",
     "check": "pnpm lint && pnpm test:types && vitest run --coverage",
-    "build": "unbuild",
+    "build": "tsdown",
     "release": "pnpm dlx changelogen@latest --release --push --publish",
     "prepare": "simple-git-hooks",
     "prepublishOnly": "pnpm run build"
@@ -72,9 +72,9 @@
     "klona": "^2.0.6",
     "lint-staged": "^16.4.0",
     "simple-git-hooks": "^2.14.0",
+    "tsdown": "^0.23.0",
     "tsx": "^4.23.13",
     "typescript": "^5.9.3",
-    "unbuild": "^3.6.1",
     "vitest": "^3.2.7"
   },
   "simple-git-hooks": {

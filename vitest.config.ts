@@ -1,8 +1,9 @@
-import sharedConfig from './shared.config'
+import { defineConfig } from 'vitest/config'
 
-export default {
-  resolve: {
-    alias: sharedConfig.alias,
+export default defineConfig({
+  test: {
+    coverage: {
+      exclude: ['tsdown.config.ts'],
+    },
   },
-  ...sharedConfig,
-}
+})
