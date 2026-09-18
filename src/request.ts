@@ -1,12 +1,22 @@
-import type { LambdaEvent, LambdaRequestEvent } from '@namesmt/utils-lambda'
+import type { LambdaRequestEvent } from '@namesmt/utils-lambda'
 import type { ALBEvent, APIGatewayProxyEvent, APIGatewayProxyEventV2, APIGatewayProxyResult, APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
-import type { EventProcessor } from './common'
+import type { EventProcessor, ResultOptions } from './common'
 
-import type { LambdaHandlerResult } from './types'
+import type { AdapterEvent, LambdaHandlerResult, LatticeProxyEventV2 } from './types'
 import { decodeBase64, encodeBase64 } from 'hono/utils/encode'
-import { isContentEncodingBinary, isContentTypeBinary } from './common'
+import { defaultIsContentTypeBinary, isContentEncodingBinary } from './common'
 
-abstract class RequestEventProcessor<E extends LambdaRequestEvent> implements EventProcessor<E> {
+// eslint-disable-next-line no-control-regex
+const NON_ASCII_REGEX = /[^\x00-\x7F]/
+
+function sanitizeHeaderValue(value: string): string {
+  // Check if the value contains non-ASCII characters (char codes > 127)
+  if (!NON_ASCII_REGEX.test(value))
+    return value
+  return encodeURIComponent(value)
+}
+
+abstract class RequestEventProcessor<E extends LambdaRequestEvent | LatticeProxyEventV2> implements EventProcessor<E> {
   protected abstract getPath(event: E): string
 
   protected abstract getMethod(event: E): string
@@ -42,15 +52,18 @@ abstract class RequestEventProcessor<E extends LambdaRequestEvent> implements Ev
     }
 
     if (event.body) {
-      requestInit.body = event.isBase64Encoded ? decodeBase64(event.body) : event.body
+      const body = event.isBase64Encoded ? decodeBase64(event.body) : new TextEncoder().encode(event.body)
+      requestInit.body = body
+      headers.set('content-length', body.length.toString())
     }
 
     return new Request(url, requestInit)
   }
 
-  async createResult(event: E, res: Response): Promise<LambdaHandlerResult> {
+  async createResult(event: E, res: Response, options?: ResultOptions): Promise<LambdaHandlerResult> {
     const contentType = res.headers.get('content-type')
-    let isBase64Encoded = !!(contentType && isContentTypeBinary(contentType))
+    const isContentTypeBinaryFn = options?.isContentTypeBinary ?? defaultIsContentTypeBinary
+    let isBase64Encoded = !!(contentType && isContentTypeBinaryFn(contentType))
 
     if (!isBase64Encoded) {
       const contentEncoding = res.headers.get('content-encoding')
@@ -149,10 +162,19 @@ class EventV1Processor extends RequestEventProcessor<Exclude<LambdaRequestEvent,
   }
 
   protected getQueryString(event: Exclude<LambdaRequestEvent, APIGatewayProxyEventV2>): string {
-    return Object.entries(event.queryStringParameters || {})
-      .filter(([, value]) => value)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&')
+    // API Gateway passes decoded values, so we need to re-encode them to preserve the original URL
+    if ((event as APIGatewayProxyEvent).multiValueQueryStringParameters) {
+      return Object.entries((event as APIGatewayProxyEvent).multiValueQueryStringParameters || {})
+        .filter(([, value]) => value)
+        .map(([key, values]) => values!.map(value => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&'))
+        .join('&')
+    }
+    else {
+      return Object.entries(event.queryStringParameters || {})
+        .filter(([, value]) => value)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value || '')}`)
+        .join('&')
+    }
   }
 
   protected getCookies(
@@ -167,19 +189,17 @@ class EventV1Processor extends RequestEventProcessor<Exclude<LambdaRequestEvent,
   protected getHeaders(event: APIGatewayProxyEvent): Headers {
     const headers = new Headers()
     this.getCookies(event, headers)
-    if (event.headers) {
-      for (const [k, v] of Object.entries(event.headers)) {
-        if (v) {
-          headers.set(k, v)
-        }
-      }
-    }
     if (event.multiValueHeaders) {
       for (const [k, values] of Object.entries(event.multiValueHeaders)) {
         if (values) {
-          // avoid duplicating already set headers
-          const foundK = headers.get(k)
-          values.forEach(v => (!foundK || !foundK.includes(v)) && headers.append(k, v))
+          values.forEach(v => headers.append(k, sanitizeHeaderValue(v)))
+        }
+      }
+    }
+    if (event.headers) {
+      for (const [k, v] of Object.entries(event.headers)) {
+        if (v && !headers.has(k)) {
+          headers.set(k, sanitizeHeaderValue(v))
         }
       }
     }
@@ -208,14 +228,14 @@ class ALBProcessor extends RequestEventProcessor<ALBEvent> {
       for (const [key, values] of Object.entries(event.multiValueHeaders)) {
         if (values && Array.isArray(values)) {
           // https://www.rfc-editor.org/rfc/rfc9110.html#name-common-rules-for-defining-f
-          headers.set(key, values.join('; '))
+          headers.set(key, sanitizeHeaderValue(values.join('; ')))
         }
       }
     }
     else {
       for (const [key, value] of Object.entries(event.headers ?? {})) {
         if (value) {
-          headers.set(key, value)
+          headers.set(key, sanitizeHeaderValue(value))
         }
       }
     }
@@ -281,17 +301,67 @@ class ALBProcessor extends RequestEventProcessor<ALBEvent> {
     }
     else {
       // otherwise serialize the set-cookie
-      result.headers!['set-cookie'] = cookies.join(', ')
+      result.headers!['set-cookie'] = cookies[0]
     }
   }
 }
 
 export const albProcessor: ALBProcessor = new ALBProcessor()
 
-export function isProxyEventALB(event: LambdaEvent): event is ALBEvent {
+class LatticeV2Processor extends RequestEventProcessor<LatticeProxyEventV2> {
+  protected getPath(event: LatticeProxyEventV2): string {
+    return event.path
+  }
+
+  protected getMethod(event: LatticeProxyEventV2): string {
+    return event.method
+  }
+
+  protected getQueryString(): string {
+    return ''
+  }
+
+  protected getHeaders(event: LatticeProxyEventV2): Headers {
+    const headers = new Headers()
+    if (event.headers) {
+      for (const [k, values] of Object.entries(event.headers)) {
+        if (values) {
+          values.forEach(v => headers.append(k, sanitizeHeaderValue(v)))
+        }
+      }
+    }
+    return headers
+  }
+
+  protected getCookies(): void {
+    // nop
+  }
+
+  protected setCookiesToResult(
+    _: LatticeProxyEventV2,
+    result: APIGatewayProxyResult,
+    cookies: string[],
+  ): void {
+    result.headers = {
+      ...result.headers,
+      'set-cookie': cookies[0],
+    }
+  }
+}
+
+export const latticeV2Processor: LatticeV2Processor = new LatticeV2Processor()
+
+export function isProxyEventALB(event: AdapterEvent): event is ALBEvent {
   return Object.hasOwn(event, 'requestContext') && Object.hasOwn((event as LambdaRequestEvent).requestContext, 'elb')
 }
 
-export function isProxyEventV2(event: LambdaEvent): event is APIGatewayProxyEventV2 {
-  return Object.hasOwn(event, 'rawPath')
+export function isProxyEventV2(event: AdapterEvent): event is APIGatewayProxyEventV2 {
+  // A V1 (REST API) event behind a custom domain base path mapping also carries a
+  // `rawPath`, so `rawPath` alone is not enough to identify a V2 event. Every V2
+  // (HTTP API / function URL) event has an `http` object on its request context.
+  return Object.hasOwn(event, 'rawPath') && Object.hasOwn((event as LambdaRequestEvent).requestContext ?? {}, 'http')
+}
+
+export function isLatticeEventV2(event: AdapterEvent): event is LatticeProxyEventV2 {
+  return Object.hasOwn(event, 'requestContext') && Object.hasOwn((event as LatticeProxyEventV2).requestContext ?? {}, 'serviceArn')
 }

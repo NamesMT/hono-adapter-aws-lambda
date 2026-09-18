@@ -1,8 +1,9 @@
-import type { CommonTriggerEventsMap, LambdaEvent, LambdaTriggerEvent } from '@namesmt/utils-lambda'
+import type { CommonTriggerEventsMap, LambdaTriggerEvent } from '@namesmt/utils-lambda'
 import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda'
 import type { Env } from 'hono'
 import type { H } from 'hono/types'
 import type { EventProcessor } from './common'
+import type { AdapterEvent } from './types'
 import { Hono } from 'hono'
 import { encodeBase64 } from 'hono/utils/encode'
 import { mergePath } from 'hono/utils/url'
@@ -129,7 +130,7 @@ export function getEventSource(event: LambdaTriggerEvent): string {
   return eventSource
 }
 
-export function isTriggerEvent(event: LambdaEvent): event is LambdaTriggerEvent {
+export function isTriggerEvent(event: AdapterEvent): event is LambdaTriggerEvent {
   try {
     return Boolean(getEventSource(event as LambdaTriggerEvent))
   }

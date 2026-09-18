@@ -1,29 +1,39 @@
-import type { LambdaEvent } from '@namesmt/utils-lambda'
+import type { AdapterEvent } from './types'
 
-import { albProcessor, isProxyEventALB, isProxyEventV2, v1Processor, v2Processor } from './request'
+import { albProcessor, isLatticeEventV2, isProxyEventALB, isProxyEventV2, latticeV2Processor, v1Processor, v2Processor } from './request'
 import { isTriggerEvent, triggerProcessor } from './trigger'
 
-const CONTENT_TYPE_TEXT_REGEX = /^(?:text\/(?:plain|html|css|javascript|csv).*|application\/(?:.*json|.*xml).*|image\/svg\+xml.*)$/
-const CONTENT_ENCODING_BINARY_REGEX = /^(?:gzip|deflate|compress|br)/
+const CONTENT_TYPE_TEXT_REGEX = /^text\/(?:plain|html|css|javascript|csv)|(?:\/|\+)(?:json|xml)\s*(?:;|$)/
+const CONTENT_ENCODING_IDENTITY_REGEX = /^identity$/i
 
-export function isContentTypeBinary(contentType: string) {
+/**
+ * Check if the given content type is binary.
+ * This is the default used by `handle`/`streamHandle` and may be overridden via the
+ * `isContentTypeBinary` option.
+ */
+export function defaultIsContentTypeBinary(contentType: string): boolean {
   return !CONTENT_TYPE_TEXT_REGEX.test(contentType)
 }
 
-export function isContentEncodingBinary(contentEncoding: string | null) {
-  if (contentEncoding === null) {
-    return false
-  }
-  return CONTENT_ENCODING_BINARY_REGEX.test(contentEncoding)
+export function isContentTypeBinary(contentType: string) {
+  return defaultIsContentTypeBinary(contentType)
 }
 
-export abstract class EventProcessor<E extends LambdaEvent> {
+export function isContentEncodingBinary(contentEncoding: string | null) {
+  return !!contentEncoding && !CONTENT_ENCODING_IDENTITY_REGEX.test(contentEncoding)
+}
+
+export interface ResultOptions {
+  isContentTypeBinary?: (contentType: string) => boolean
+}
+
+export abstract class EventProcessor<E extends AdapterEvent> {
   abstract createRequest(event: E): Request
 
-  abstract createResult(event: E, res: Response): Promise<any>
+  abstract createResult(event: E, res: Response, options?: ResultOptions): Promise<any>
 }
 
-export function getProcessor(event: LambdaEvent): EventProcessor<LambdaEvent> {
+export function getProcessor(event: AdapterEvent): EventProcessor<AdapterEvent> {
   if (isTriggerEvent(event))
     return triggerProcessor
   if (isProxyEventALB(event))
@@ -31,6 +41,9 @@ export function getProcessor(event: LambdaEvent): EventProcessor<LambdaEvent> {
 
   if (isProxyEventV2(event))
     return v2Processor
+
+  if (isLatticeEventV2(event))
+    return latticeV2Processor
 
   return v1Processor
 }
