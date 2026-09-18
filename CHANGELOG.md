@@ -1,6 +1,30 @@
 # Changelog
 
 
+## v1.4.0
+
+[compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.5...v1.4.0)
+
+### 🚀 Enhancements
+
+- Port upstream fixes, VPC Lattice support, and isContentTypeBinary option ([822b373](https://github.com/namesmt/hono-adapter-aws-lambda/commit/822b373))
+
+### 📦 Build
+
+- ⚠️  Migrate to tsdown with native import maps ([99762cf](https://github.com/namesmt/hono-adapter-aws-lambda/commit/99762cf))
+
+### 🤖 CI
+
+- Add CI workflow ([edd1b94](https://github.com/namesmt/hono-adapter-aws-lambda/commit/edd1b94))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Migrate to tsdown with native import maps ([99762cf](https://github.com/namesmt/hono-adapter-aws-lambda/commit/99762cf))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](https://github.com/NamesMT))
+
 ## v1.3.5
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.4...v1.3.5)
