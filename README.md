@@ -47,6 +47,25 @@ triggerFactory.on('aws:s3', '$!', c => c.text((c.env.event as S3Event).Records[0
 
 See some more examples in the test file: [test/index.test.ts](test/index.test.ts)
 
+## Releasing
+
+Releases are manual and version-first: the version is an input, not decided by the workflow.
+
+1. Run **Actions → Release → Run workflow**, enter the version to ship without a leading `v`
+   (e.g. `1.5.0`) and optionally tick **dry-run** to stop before pushing/publishing.
+2. The workflow validates the version, runs `pnpm run check`, builds, then changelogen bumps
+   `package.json`, writes `CHANGELOG.md`, commits and tags `v<version>`.
+3. It pushes the commit and tag, creates the GitHub release from the changelog section, and
+   publishes to npm with provenance over [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC, no token).
+
+A pushed tag does not publish anything — only this dispatch does. Locally you can validate a
+version with `pnpm run release:check 1.5.0` and preview the next changelog with
+`pnpm run release:preview`.
+
+Before the first automated release: publish the package once by hand, then on npmjs.com open the
+package's **Settings → Trusted Publisher** and add this repository with the workflow filename
+`release.yml`.
+
 ## License
 [MIT](./LICENSE) License © 2024 [NamesMT](https://github.com/NamesMT)
 
