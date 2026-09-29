@@ -53,3 +53,6 @@ commit/tag/changelog locally and only skips the push, GitHub release and npm pub
 - `pnpm test` watches; anything non-interactive must use `vitest run` (as `check` does).
 - `dist/` is built, never committed — it is gitignored, but a stale copy exists locally.
 - Release changelogen uses `--clean`: it fails on a non-empty `git status --porcelain` (ignored `dist/` does not count).
+- `handle()` and `streamHandle()` accept `HandleConfigOptions`: `easyRouteKey` fills a minimal request from `routeKey` when the event has no `requestContext.http`, and `isContentTypeBinary` overrides the default text/binary split.
+- Route the adapter by setting the `$HAAL-returnBody` response header: both handlers then return the parsed JSON body as the Lambda result instead of going through `createResult`.
+- `repository.url` must keep the canonical `NamesMT` casing — with `--provenance`, npm fails the publish when the URL owner does not match the GitHub owner.

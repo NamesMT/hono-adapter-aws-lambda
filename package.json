@@ -3,21 +3,30 @@
   "type": "module",
   "version": "1.4.0",
   "packageManager": "pnpm@12.4.1",
-  "description": "",
+  "description": "Run Hono apps on AWS Lambda: API Gateway v1/v2, ALB, function URLs and non-HTTP triggers (S3, SQS) via route-based trigger factories.",
   "author": "NamesMT <dangquoctrung123@gmail.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/namesmt",
-  "homepage": "https://github.com/namesmt/hono-adapter-aws-lambda#readme",
+  "homepage": "https://github.com/NamesMT/hono-adapter-aws-lambda#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/namesmt/hono-adapter-aws-lambda.git"
+    "url": "git+https://github.com/NamesMT/hono-adapter-aws-lambda.git"
   },
-  "bugs": "https://github.com/namesmt/hono-adapter-aws-lambda/issues",
+  "bugs": "https://github.com/NamesMT/hono-adapter-aws-lambda/issues",
   "keywords": [
     "hono",
     "adapter",
     "aws",
-    "lambda"
+    "lambda",
+    "aws-lambda",
+    "api-gateway",
+    "alb",
+    "s3",
+    "sqs",
+    "serverless",
+    "edge",
+    "triggers",
+    "typescript"
   ],
   "sideEffects": false,
   "imports": {
