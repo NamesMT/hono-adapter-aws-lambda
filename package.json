@@ -1,7 +1,7 @@
 {
   "name": "hono-adapter-aws-lambda",
   "type": "module",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "packageManager": "pnpm@12.4.1",
   "description": "Run Hono apps on AWS Lambda: API Gateway v1/v2, ALB, function URLs and non-HTTP triggers (S3, SQS) via route-based trigger factories.",
   "author": "NamesMT <dangquoctrung123@gmail.com>",

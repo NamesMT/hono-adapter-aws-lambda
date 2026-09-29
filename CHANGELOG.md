@@ -1,6 +1,27 @@
 # Changelog
 
 
+## v1.4.1
+
+[compare changes](https://github.com/NamesMT/hono-adapter-aws-lambda/compare/v1.4.0...v1.4.1)
+
+### 🩹 Fixes
+
+- Publish npm metadata and correct repository URL casing ([a7ea47f](https://github.com/NamesMT/hono-adapter-aws-lambda/commit/a7ea47f))
+
+### 🏡 Chore
+
+- **devcontainer:** Migrate from Alpine (musl) to Arch (glibc) image ([132155d](https://github.com/NamesMT/hono-adapter-aws-lambda/commit/132155d))
+- **devcontainer:** Bootstrap pnpm via corepack when missing ([51d070b](https://github.com/NamesMT/hono-adapter-aws-lambda/commit/51d070b))
+
+### 🤖 CI
+
+- **release:** Dispatch releases by hand and add an AGENTS.md ([9a68d1e](https://github.com/NamesMT/hono-adapter-aws-lambda/commit/9a68d1e))
+
+### ❤️ Contributors
+
+- NamesMT ([@NamesMT](https://github.com/NamesMT))
+
 ## v1.4.0
 
 [compare changes](https://github.com/namesmt/hono-adapter-aws-lambda/compare/v1.3.5...v1.4.0)
