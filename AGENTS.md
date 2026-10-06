@@ -56,3 +56,23 @@ commit/tag/changelog locally and only skips the push, GitHub release and npm pub
 - `handle()` and `streamHandle()` accept `HandleConfigOptions`: `easyRouteKey` fills a minimal request from `routeKey` when the event has no `requestContext.http`, and `isContentTypeBinary` overrides the default text/binary split.
 - Route the adapter by setting the `$HAAL-returnBody` response header: both handlers then return the parsed JSON body as the Lambda result instead of going through `createResult`.
 - `repository.url` must keep the canonical `NamesMT` casing — with `--provenance`, npm fails the publish when the URL owner does not match the GitHub owner.
+
+## How to work here
+
+- Read the callers and the tests first; flag unclear impact.
+- Don't rewrite or delete what you haven't understood; don't invent requirements.
+- Report the risk (correctness, security, operational, integration), not just the change.
+- **Fix the root cause, not the instance:** a copied helper, a duplicated rule, a second path around a
+  guard — one implementation, one guard.
+- Verify before claiming; a test pins only what it asserts.
+- Unrecalled project? Read this file and `git log`.
+
+## Conciseness (applies everywhere)
+
+Code, comments, docs: one idea per sentence, nothing that changes no action, the rule not the story
+`git log` holds — and never a caveat dropped for a line.
+
+## User-facing docs
+
+`README.md` only (no `docs/`; the changelog is generated): concise first read, `<details>` for depth,
+badges for skimmers, shipped with the change.
