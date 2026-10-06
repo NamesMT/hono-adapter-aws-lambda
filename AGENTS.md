@@ -74,5 +74,5 @@ Code, comments, docs: one idea per sentence, nothing that changes no action, the
 
 ## User-facing docs
 
-`README.md` only (no `docs/`; the changelog is generated): concise first read, `<details>` for depth,
-badges for skimmers, shipped with the change.
+`README.md` only (no `docs/`; the changelog is generated): badges and a short read, shipped with the
+change.
