@@ -68,7 +68,8 @@ pnpm exec vitest run      # run the suite once (`pnpm test` is watch mode)
 ## Conciseness
 
 Code, comments, docs: one idea per sentence, nothing that changes no action, the rule not the story
-`git log` holds — and never a caveat dropped for a line.
+`git log` holds — and never a caveat dropped for a line. Comments stay short too: a block arguing
+for its own change is a commit message, not a comment.
 
 ## User-facing docs
 
