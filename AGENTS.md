@@ -7,17 +7,18 @@ with [tsdown](https://github.com/rolldown/tsdown), tested with [Vitest](https://
 
 ## Docs
 
-Three tiers, so a reader loads only what the task needs:
+Where knowledge lives, and when to reach for each:
 
-1. **`AGENTS.md`** (this file) — orientation and the rules that prevent defects. Read every session.
-2. **`.agentDocs/`** — depth that would bloat this file: module rationale, traps with their causes,
-   compatibility rules. Read on demand.
-3. **`README.md` / `docs/`** — for a person using the package, not for an agent.
+| tier | what it holds | when you use it |
+| --- | --- | --- |
+| `AGENTS.md` — this file | orientation and the rules that prevent defects | read every session; write when a rule is learned the hard way |
+| `.agentDocs/` | depth: module rationale, traps with their causes, compatibility | read on demand, before touching that area; write when a rule needs its reasoning kept |
+| `docs/` | how-to and reference for a person using this package | read when the task is user-facing; write in the same commit as the change |
+| `README.md` | the first read, for a person | write alongside `docs/` |
 
-**There is no `.agentDocs/` here yet and none is needed at this size.** Create one when a section
-above outgrows a screen or two: move the *reasoning* out and keep the *rule* here with a pointer to
-it — nobody reads a file they do not open. Each document opens with a one-line scope, and this file
-links it.
+- **One home per fact.** State the rule here, keep the reasoning in `.agentDocs/` and link it — never both.
+- **A dead pointer is a bug.** If the target is gone, delete the pointer rather than leave it.
+- Move depth behind a pointer once a section outgrows a screen or two; keep the rule inline.
 
 ## Commands
 
@@ -28,7 +29,11 @@ pnpm run check            # lint + test:types + vitest run --coverage — the re
 pnpm run build            # tsdown -> dist/index.mjs + dist/index.d.mts
 pnpm run release:check    # validate a version against package.json: `pnpm run release:check 1.5.0`
 pnpm run release:preview  # print the changelog the next release would get
-pnpm exec vitest run      # run the suite once (`pnpm test` is watch mode)
+pnpm run test             # vitest watch mode
+pnpm exec vitest run      # run the suite once
+pnpm run start            # NODE_ENV=dev tsx src/index.ts — no watch
+pnpm run watch            # NODE_ENV=dev tsx watch src/index.ts
+pnpm run dev             # alias of `pnpm run watch`
 ```
 
 ## Structure
@@ -40,36 +45,51 @@ pnpm exec vitest run      # run the suite once (`pnpm test` is watch mode)
   imports via the `#src/*` alias with a `.js` suffix and the fixture `test/sample-event-v2.json`.
 - `package.json`: `imports` maps `#src/*` -> `./src/*`; `exports`/`main`/`module`/`types` point at
   `dist/`, and `files` ships only `dist`.
-- `tsdown.config.ts` — single entry `src/index.ts`, `dts: true`; `vitest.config.ts` only sets coverage excludes.
 - `.github/workflows/` — `ci.yml` runs lint + types + `pnpm test` (no coverage) on Node 22.x for
   pushes/PRs to `main`; `release.yml` is manual and runs `pnpm run check` on Node 24.
 
 ## Conventions
 
 - Conventional commits (`feat:`, `fix:`, `chore:`, …) — the changelog is derived from them.
-- ESLint via `@antfu/eslint-config` owns formatting: no Prettier, single quotes, 2-space indent,
-  sorted imports. `lint-staged` runs `eslint --fix` on every commit, so run `pnpm run lint` before
-  claiming a change is clean. The config deliberately allows trailing spaces in comments.
+- ESLint (`@antfu/eslint-config`) owns lint and formatting; `lint-staged` runs `eslint --fix` on commit — run `pnpm run lint` before claiming a change is clean.
 - ESM only, `"type": "module"` with an `import`-only `exports` map; do not add a CJS build.
-- The repo targets Node >= 22 and AWS LLRT, so `node:`-protocol imports are intentionally not
-  enforced (`unicorn/prefer-node-protocol` is off).
+- The repo targets Node >= 22 and AWS LLRT, so `node:`-protocol imports are intentionally allowed.
 - `hono` is a peer dependency; `@namesmt/utils-lambda` is a runtime dependency.
 
 ## How to work here
 
-- Read the callers and the tests first; flag unclear impact.
-- Don't rewrite or delete what you haven't understood; don't invent requirements.
-- Report the risk (correctness, security, operational, integration), not just the change.
-- **Fix the root cause, not the instance:** a copied helper, a duplicated rule, a second path around a
-  guard — one implementation, one guard.
-- **Verify before claiming, and say what you checked.** A green test proves only what it asserts — **break the thing it guards and watch it fail.** If it still passes, either the test is decoration or a different guard is running; find out which. Where a stub cannot answer the question, drive the real thing. Mark anything unverified as unverified.
-- Unrecalled project? Read this file and `git log`.
+- **Check the callers before you change anything.** Grep who uses it and which tests name it. If the
+  impact is unclear, say so — do not guess.
+- **Never overwrite or delete a large section you have not understood.** Read it, or say what you could
+  not determine and ask.
+- **Do not invent requirements.** Build what was asked; surface what else you notice and let it be
+  decided.
+- **Fix the class, not the instance.** A copied helper, a rule stated twice, a guard bypassed by a
+  second path is one problem: one implementation, one guard. That is the work, not a follow-up to ask
+  for. Stay inside the task rather than refactoring the world.
+- **Verify before claiming, and say what you checked.** A passing test is not evidence it pins
+  anything — **break the thing it guards and watch it fail.** If it still passes, either the test is
+  decoration or a different guard is running; find out which. Where a stub cannot answer the question,
+  drive the real thing.
+- **Never write an identifier from memory.** A commit hash, path, line number or version must be quoted
+  from the source; a plausible-looking invented one is worse than none.
+- **A stated blocker is a hypothesis, not a fact.** Re-test "cannot install X" / "tool unavailable"
+  before inheriting it, and never report a failure your own flag forced.
+- **Report the risk with the change** — correctness, security, operational and integration; plus what
+  you could not verify and every assumption you made. An unverified claim marked as such beats a
+  confident one that is wrong.
+- **Missing recall of this repo?** Read this file, `.agentDocs/` and `git log` before acting, then ask
+  1–3 focused questions rather than guessing at intent.
 
 ## Conciseness
 
-Code, comments, docs: one idea per sentence, nothing that changes no action, the rule not the story
-`git log` holds — and never a caveat dropped for a line. Comments stay short too: a block arguing
-for its own change is a commit message, not a comment.
+**Prune verbose, keep correctness** — code, comments, docs alike.
+
+- Code: a comment only for non-obvious *intent*, never to restate the line, and never long. A block
+  arguing for its own change is a commit message.
+- Docs: one idea per sentence. Cut anything that would not change what a reader does.
+- Delete history `git log` already holds — keep the *rule* that came out of it, not the story.
+- **Never drop a caveat to save a line.** Concise means no filler, not fewer facts.
 
 ## User-facing docs
 
